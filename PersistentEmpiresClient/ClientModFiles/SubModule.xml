@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Module>
+  <Name value="FeudalKingdoms" />
+  <Id value="FeudalKingdoms" />
+  <Version value="v1.3.8.0" />
+  <ModuleCategory value="Multiplayer" />
+  <DependedModules>
+    <DependedModule Id="Native" DependentVersion="e1.8.1" Optional="false" />
+    <DependedModule Id="Multiplayer" DependentVersion="e1.8.1" Optional="false" />
+  </DependedModules>
+  <SubModules>
+    <SubModule>
+      <Name value="PersistentEmpiresLib" />
+      <DLLName value="PersistentEmpiresLib.dll" />
+      <SubModuleClassType value="PersistentEmpiresLib.Main" />
+      <Tags>
+        <Tag key="DedicatedServerType" value="none" />
+        <Tag key="IsNoRenderModeElement" value="false" />
+      </Tags>
+    </SubModule>
+    <SubModule>
+      <Name value="PersistentEmpires" />
+      <DLLName value="PersistentEmpiresClient.dll" />
+      <SubModuleClassType value="PersistentEmpiresClient.PersistentEmpiresClientSubModule" />
+      <Tags>
+        <Tag key="DedicatedServerType" value="none" />
+        <Tag key="IsNoRenderModeElement" value="false" />
+      </Tags>
+    </SubModule>
+  </SubModules>
+  <Xmls>
+    <XmlNode>
+      <XmlName id="Items" path="pe_shields" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="pe_weapons" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="CraftingPieces" path="pe_crafting_pieces" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="CraftingTemplates" path="pe_crafting_templates" />
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="WeaponDescriptions" path="pe_weapon_descriptions" />
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="MPCharacters" path="mpcharacters" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="mpitems" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="pe_animals" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="MPClassDivisions" path="mpclassdivisions" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="GameText" path="native_strings" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="SwadianArmoury" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="ExpandedBannerlordArmoury" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="HatsAndStuff" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="HatsAndStuffClothing" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="HatsAndStuffFantasy" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="pe_shoulder_armors" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="pe_arm_armors" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="pe_body_armors" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="pe_head_armors" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="pe_leg_armors" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+    <XmlNode>
+      <XmlName id="Items" path="HorseCapitems" />
+      <IncludedGameTypes>
+        <GameType value="MultiplayerGame" />
+      </IncludedGameTypes>
+    </XmlNode>
+  </Xmls>
+</Module>
