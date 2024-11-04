@@ -232,7 +232,7 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             base.OnInit();
             // Set OnHover Variables
-            Debug.Print("[Feudal Kingdoms] Initiating Crafting Station With " + this.ModuleFolder + " Module", 0, Debug.DebugColor.DarkCyan);
+            Debug.Print("[Avalon HCRP] Initiating Crafting Station With " + this.ModuleFolder + " Module", 0, Debug.DebugColor.DarkCyan);
             TextObject actionMessage = new TextObject("Use {Station} To Craft");
             actionMessage.SetTextVariable("Station", this.StationName);
             base.ActionMessage = actionMessage;
@@ -252,7 +252,12 @@ namespace PersistentEmpiresLib.SceneScripts
                 //Load Craftables
                 string xmlPath = ModuleHelper.GetXmlPath(this.ModuleFolder, "CraftingRecipies/" + this.CraftingRecieptTag);
                 XmlDocument xmlDocument = new XmlDocument();
-                xmlDocument.Load(xmlPath);
+                try
+                { xmlDocument.Load(xmlPath); }
+                catch (Exception e)
+                {
+                    Debug.Print("[Avalon HCRP] Error Loading Crafting Recipies For " + this.StationName + " " + this.GameEntity.GetGlobalFrame() + " Looking For: " + this.CraftingRecieptTag, 0, Debug.DebugColor.Red);
+                }
                 foreach (XmlNode node in xmlDocument.DocumentElement.ChildNodes)
                 {
                     if (node.Name == "Craftings") this.Craftings = node.InnerText.Trim();

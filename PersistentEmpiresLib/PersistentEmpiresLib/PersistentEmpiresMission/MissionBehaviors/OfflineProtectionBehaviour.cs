@@ -17,8 +17,11 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         public override void OnBehaviorInitialize()
         {
             var timeUtc = DateTime.UtcNow;
+            this.StartHour = ConfigManager.GetIntConfig("OfflineStartHour", 4);
+            this.EndHour = ConfigManager.GetIntConfig("OfflineEndHour", 16);
             TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
             DateTime easternTime = TimeZoneInfo.ConvertTimeFromUtc(timeUtc, easternZone);
+            Debug.Print("[Avalon HCRP] Offline Protection Initalized", 0, Debug.DebugColor.Purple);
             Debug.Print("Current Eastern Time: " + easternTime.Hour.ToString());
             if (easternTime.Hour >= StartHour && easternTime.Hour < EndHour)
             {

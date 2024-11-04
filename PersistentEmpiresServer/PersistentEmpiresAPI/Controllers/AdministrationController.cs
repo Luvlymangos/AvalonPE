@@ -165,13 +165,38 @@ namespace PersistentEmpiresAPI.Controllers
             };
         }
 
+        [HttpPost("skillsupdate")]
+        public ActionResult<ResultDTO> SkillsPlayer(EditSkillsDTO request)
+        {
+            foreach (NetworkCommunicator communicator in GameNetwork.NetworkPeers.ToArray())
+            {
+                if (communicator.VirtualPlayer.Id.ToString() == request.PlayerId && communicator.IsConnectionActive)
+                {
+                    PersistentEmpireRepresentative persistentEmpireRepresentative = communicator.GetComponent<PersistentEmpireRepresentative>();
+                    if (persistentEmpireRepresentative != null && persistentEmpireRepresentative.LoadedSkills.ContainsKey(request.Skillname))
+                    {
+                        persistentEmpireRepresentative.LoadedSkills[request.Skillname] = request.SkillValue;
+                        SaveSystemBehavior.HandleCreateOrSavePlayer(communicator);
+                    }
+                    break;
+                }
+            }
+            return new ResultDTO
+            {
+                Status = true,
+                Reason = "Player Updated"
+            };
+        }
+
+
         [HttpGet("servercap")]
         public ActionResult<ResultDTO> ServerCap()
         {
             return new ResultDTO
             {
                 Status = true,
-                Reason = GameNetwork.NetworkPeerCount.ToString()
+                Reason = GameNetwork.NetworkPeerCount.ToString(),
+                ServerName = MultiplayerOptions.OptionType.ServerName.GetStrValue(MultiplayerOptions.MultiplayerOptionsAccessMode.CurrentMapOptions)
             };
         }
 

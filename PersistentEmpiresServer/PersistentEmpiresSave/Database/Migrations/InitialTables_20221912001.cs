@@ -153,9 +153,9 @@ namespace PersistentEmpiresSave.Database.Migrations
 
             Create.Table("carts")
                 .WithColumn("Id").AsString()
-                .WithColumn("PosX").AsFloat().WithDefaultValue(0)
-                .WithColumn("PosY").AsFloat().WithDefaultValue(0)
-                .WithColumn("PosZ").AsFloat().WithDefaultValue(0)
+                .WithColumn("PosX").AsInt32().WithDefaultValue(0)
+                .WithColumn("PosY").AsInt32().WithDefaultValue(0)
+                .WithColumn("PosZ").AsInt32().WithDefaultValue(0)
                 .WithColumn("Prefab").AsString()
                 .WithColumn("InventoryId").AsString();
 

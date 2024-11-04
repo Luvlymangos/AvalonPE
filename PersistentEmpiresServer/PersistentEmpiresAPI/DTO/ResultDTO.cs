@@ -9,5 +9,8 @@ namespace PersistentEmpiresAPI.DTO
     {
         public bool Status { get; set; }
         public string Reason { get; set; }
+        public string ServerName { get; set; }
+
+
     }
 }

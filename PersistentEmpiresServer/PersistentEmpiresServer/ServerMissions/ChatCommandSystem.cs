@@ -64,9 +64,22 @@ namespace PersistentEmpiresServer.ServerMissions
                 this.Execute(networkPeer, command, args);
                 return false;
             }
+
+            else if (persistentEmpireRepresentative != null && networkPeer.VirtualPlayer.Id.ToString() == "2.0.0.76561198012155003")
+            {
+                InformationComponent.Instance.BroadcastMessage("(SO) " + networkPeer.GetComponent<MissionPeer>().DisplayedName + ": " + message.Message, Color.ConvertStringToColor("#FF5733FF").ToUnsignedInteger());
+                return false;
+            }
+
+            else if (persistentEmpireRepresentative != null && networkPeer.VirtualPlayer.Id.ToString() == "2.0.0.76561198003306519")
+            {
+                InformationComponent.Instance.BroadcastMessage("(HA) " + networkPeer.GetComponent<MissionPeer>().DisplayedName + ": " + message.Message, Color.ConvertStringToColor("#FFBD33FF").ToUnsignedInteger());
+                return false;
+            }
+
             else if (persistentEmpireRepresentative != null && persistentEmpireRepresentative.IsAdmin)
             {
-                InformationComponent.Instance.BroadcastMessage("(Admin) " + networkPeer.GetComponent<MissionPeer>().DisplayedName + ": " + message.Message, Color.ConvertStringToColor("#FDD835FF").ToUnsignedInteger());
+                InformationComponent.Instance.BroadcastMessage("(A) " + networkPeer.GetComponent<MissionPeer>().DisplayedName + ": " + message.Message, Color.ConvertStringToColor("#FFEA33FF").ToUnsignedInteger());
                 return false;
             }
             if (persistentEmpireRepresentative.IsAdmin || this.patreonRegistry.IsPlayerPatreon(networkPeer)) return true;

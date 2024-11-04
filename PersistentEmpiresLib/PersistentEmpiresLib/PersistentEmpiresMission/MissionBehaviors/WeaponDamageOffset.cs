@@ -21,7 +21,6 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         public override void OnAgentHit(Agent affectedAgent, Agent affectorAgent, in MissionWeapon affectorWeapon, in Blow blow, in AttackCollisionData attackCollisionData)
         {
             base.OnAgentHit(affectedAgent, affectorAgent, affectorWeapon, blow, attackCollisionData);
-            if (!affectedAgent.IsHuman) return;
             if (blow.InflictedDamage == 0) return;
             if (!affectorAgent.IsHuman) return;
             if (affectorAgent == null) return;

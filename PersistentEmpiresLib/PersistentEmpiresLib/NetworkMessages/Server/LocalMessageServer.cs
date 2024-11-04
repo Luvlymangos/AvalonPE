@@ -14,12 +14,14 @@ namespace PersistentEmpiresLib.NetworkMessages.Server
     {
         public String Message;
         public NetworkCommunicator Sender;
+        public string Prefix;
 
         public LocalMessageServer() { }
-        public LocalMessageServer(String message, NetworkCommunicator sender)
+        public LocalMessageServer(String message, NetworkCommunicator sender, string prefix)
         {
             this.Sender = sender;
             this.Message = message;
+            Prefix = prefix;
         }
 
         protected override MultiplayerMessageFilter OnGetLogFilter()
@@ -37,7 +39,8 @@ namespace PersistentEmpiresLib.NetworkMessages.Server
             bool result = true;
             this.Sender = GameNetworkMessage.ReadNetworkPeerReferenceFromPacket(ref result);
             this.Message = GameNetworkMessage.ReadStringFromPacket(ref result);
-            
+            Prefix = GameNetworkMessage.ReadStringFromPacket(ref result);
+
             return result;
         }
 
@@ -45,6 +48,7 @@ namespace PersistentEmpiresLib.NetworkMessages.Server
         {
             GameNetworkMessage.WriteNetworkPeerReferenceToPacket(this.Sender);
             GameNetworkMessage.WriteStringToPacket(this.Message);
+            GameNetworkMessage.WriteStringToPacket(Prefix);
         }
     }
 }

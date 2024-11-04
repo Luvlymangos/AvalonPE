@@ -15,6 +15,7 @@ using SharpRaven.Data;
 using System.IO;
 using Database.DBEntities;
 using System.CodeDom;
+using SharpRaven.Data.Context;
 
 namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 {
@@ -536,6 +537,10 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 var result = OnCreateOrSaveCart(cart);
                 LogQuery(String.Format("[SaveSystem] OnCreateOrSaveCart Took {0} ms", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - rightNow));
                 return result;
+            }
+            else
+            {
+                Debug.Print("Fucking Null Errors");
             }
             return null;
         }

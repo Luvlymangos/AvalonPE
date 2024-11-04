@@ -116,16 +116,22 @@ namespace PersistentEmpires.Views.Views
             this._gauntletLayer.LoadMovie("PECraftingStation", this._dataSource);
             base.MissionScreen.AddLayer(this._gauntletLayer);
             PersistentEmpireRepresentative myRepresentative = GameNetwork.MyPeer.GetComponent<PersistentEmpireRepresentative>();
-            this._dataSource.WeaponLevel = myRepresentative.LoadedSkills["WeaponSmithing"];
-            this._dataSource.WeavingLevel = myRepresentative.LoadedSkills["Weaving"];
-            this._dataSource.ArmourLevel = myRepresentative.LoadedSkills["ArmourSmithing"];
-            this._dataSource.SmithingLevel = myRepresentative.LoadedSkills["BlackSmithing"];
-            this._dataSource.CarpLevel = myRepresentative.LoadedSkills["Carpentry"];
-            this._dataSource.CookingLevel = myRepresentative.LoadedSkills["Cooking"];
-            this._dataSource.FarmingLevel = myRepresentative.LoadedSkills["Farming"];
-            this._dataSource.MiningLevel = myRepresentative.LoadedSkills["Mining"];
-            this._dataSource.FletchingLevel = myRepresentative.LoadedSkills["Fletching"];
-            this._dataSource.AnimalLevel = myRepresentative.LoadedSkills["Animals"];
+            try
+            {
+                this._dataSource.WeaponLevel = myRepresentative.LoadedSkills["WeaponSmithing"];
+                this._dataSource.WeavingLevel = myRepresentative.LoadedSkills["Weaving"];
+                this._dataSource.ArmourLevel = myRepresentative.LoadedSkills["ArmourSmithing"];
+                this._dataSource.SmithingLevel = myRepresentative.LoadedSkills["BlackSmithing"];
+                this._dataSource.CarpLevel = myRepresentative.LoadedSkills["Carpentry"];
+                this._dataSource.CookingLevel = myRepresentative.LoadedSkills["Cooking"];
+                this._dataSource.FarmingLevel = myRepresentative.LoadedSkills["Farming"];
+                this._dataSource.MiningLevel = myRepresentative.LoadedSkills["Mining"];
+                this._dataSource.FletchingLevel = myRepresentative.LoadedSkills["Fletching"];
+                this._dataSource.AnimalLevel = myRepresentative.LoadedSkills["Animals"];
+            }
+            catch (Exception e)
+            {
+            }
             ScreenManager.TrySetFocus(this._gauntletLayer);
             this.IsActive = true;
         }
