@@ -63,7 +63,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
         private void HandleShoutMessageFromServer(ShoutMessageServer message)
         {
-            InformationManager.DisplayMessage(new InformationMessage("[SHOUT] " + message.Sender.UserName + ": " + message.Message, Color.ConvertStringToColor("#AFAFAFFF")));
+            InformationManager.DisplayMessage(new InformationMessage($"{message.Prefix}[SHOUT] " + message.Sender.UserName + ": " + message.Message, Color.ConvertStringToColor("#AFAFAFFF")));
             if(this.OnLocalChatMessage != null)
             {
                 this.OnLocalChatMessage(message.Sender, message.Message, true);
@@ -72,7 +72,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
         private void HandleLocalMessageFromServer(LocalMessageServer message)
         {
-            InformationManager.DisplayMessage(new InformationMessage("[LOCAL] " + message.Sender.UserName + ": " + message.Message, Color.ConvertStringToColor("#DADADAFF")));
+            InformationManager.DisplayMessage(new InformationMessage($"{message.Prefix}[LOCAL] " + message.Sender.UserName + ": " + message.Message, Color.ConvertStringToColor("#DADADAFF")));
             if (this.OnLocalChatMessage != null)
             {
                 this.OnLocalChatMessage(message.Sender, message.Message, false);
@@ -81,10 +81,26 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
         private bool HandleShoutMessageFromClient(NetworkCommunicator player,ShoutMessage message)
         {
+            string Prefix = "";
             if (player.ControlledAgent == null) return false;
+            PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
             if (this.OnPrefixHandleLocalChatFromClient != null)
             {
                 if (!this.OnPrefixHandleLocalChatFromClient(player, message.Text, true)) return true;
+            }
+            if (player.VirtualPlayer.Id.ToString() == "2.0.0.76561198012155003")
+            {
+                Prefix = "(SO)";
+            }
+
+            else if (player.VirtualPlayer.Id.ToString() == "2.0.0.76561198003306519")
+            {
+                Prefix = "(HA)";
+            }
+
+            else if (persistentEmpireRepresentative != null && persistentEmpireRepresentative.IsAdmin)
+            {
+                Prefix = "(A)";
             }
             Vec3 position = player.ControlledAgent.Position;
 
@@ -99,7 +115,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 {
                     // InformationComponent.Instance.SendMessage("(SHOUT)[" + player.UserName + "] " + message.Text, new Color(0.69f, 0.43f, 0f).ToUnsignedInteger(), otherPlayer);
                     GameNetwork.BeginModuleEventAsServer(otherPlayer);
-                    GameNetwork.WriteMessage(new ShoutMessageServer(message.Text, player));
+                    GameNetwork.WriteMessage(new ShoutMessageServer(message.Text, player, Prefix));
                     GameNetwork.EndModuleEventAsServer();
                     if (otherPlayer != player)
                     {
@@ -115,11 +131,26 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
         private bool HandleLocalMessageFromClient(NetworkCommunicator player,LocalMessage message)
         {
-            
+            string Prefix = "";
+            PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
             if (player.ControlledAgent == null) return false;
             if (this.OnPrefixHandleLocalChatFromClient != null)
             {
                 if (!this.OnPrefixHandleLocalChatFromClient(player, message.Text, false)) return true;
+            }
+            if (player.VirtualPlayer.Id.ToString() == "2.0.0.76561198012155003")
+            {
+                Prefix = "(SO)";
+            }
+
+            else if (player.VirtualPlayer.Id.ToString() == "2.0.0.76561198003306519")
+            {
+                Prefix = "(HA)";
+            }
+
+            else if (persistentEmpireRepresentative != null && persistentEmpireRepresentative.IsAdmin)
+            {
+                Prefix = "(A)";
             }
             Vec3 position = player.ControlledAgent.Position;
             List<AffectedPlayer> affectedPlayers = new List<AffectedPlayer>();
@@ -132,7 +163,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 {
                     // InformationComponent.Instance.SendMessage("(LOCAL)[" + player.UserName + "] " + message.Text, new Color(0.96f, 0.64f, 0.0078f).ToUnsignedInteger(), otherPlayer);
                     GameNetwork.BeginModuleEventAsServer(otherPlayer);
-                    GameNetwork.WriteMessage(new LocalMessageServer(message.Text, player));
+                    GameNetwork.WriteMessage(new LocalMessageServer(message.Text, player, Prefix));
                     GameNetwork.EndModuleEventAsServer();
                     if (otherPlayer != player)
                     {

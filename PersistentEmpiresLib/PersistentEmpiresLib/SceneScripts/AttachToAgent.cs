@@ -145,6 +145,10 @@ namespace PersistentEmpiresLib.SceneScripts
         protected override void OnInit()
         {
             base.OnInit();
+            if (PE_AttachToAgent.random == null)
+            {
+                PE_AttachToAgent.random = new Random();
+            }
             this.ID = GenerateId();
             base.ActionMessage = new TextObject("Attach Object");
             TextObject descriptionMessage = new TextObject("Press {KEY} To Attach");

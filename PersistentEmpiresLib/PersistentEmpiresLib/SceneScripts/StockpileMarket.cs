@@ -236,7 +236,7 @@ namespace PersistentEmpiresLib.SceneScripts
                 descriptionMessage.SetTextVariable("KEY", HyperlinkTexts.GetKeyHyperlinkText(HotKeyManager.GetHotKeyId("CombatHotKeyCategory", 13)));
                 base.DescriptionMessage = descriptionMessage;
                 this.stockpileMarketComponent = Mission.Current.GetMissionBehavior<StockpileMarketComponent>();
-                Debug.Print("[Feudal Kingdoms] Initiating Stockpile Market With " + this.ModuleFolder + " Module", 0, Debug.DebugColor.DarkCyan);
+                Debug.Print("[Avalon HCRP] Initiating Stockpile Market With " + this.ModuleFolder + " Module", 0, Debug.DebugColor.DarkCyan);
                 string xmlPath = ModuleHelper.GetXmlPath(this.ModuleFolder, "Markets/" + this.XmlFile);
                 XmlDocument xmlDocument = new XmlDocument();
                 xmlDocument.Load(xmlPath);

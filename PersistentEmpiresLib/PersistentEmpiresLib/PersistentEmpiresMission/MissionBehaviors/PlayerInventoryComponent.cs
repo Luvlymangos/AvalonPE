@@ -146,43 +146,51 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                     if (persistentEmpireRepresentative.GetFactionIndex() == attackerRepresentative.GetFactionIndex()) killedByFriendly = true;
                 }
 
+                List<(ItemObject item, int count, int ammo, bool isEquipment, EquipmentIndex equipmentIndex)> allItems = new List<(ItemObject, int, int, bool, EquipmentIndex)>();
+
+                // Gather all items in equipment slots (excluding mainHand and offHand)
                 for (EquipmentIndex i = EquipmentIndex.Weapon0; i < EquipmentIndex.ArmorItemEndSlot; i++)
                 {
-
-                    if (i != mainHand && i != offHand)
+                    if (i != mainHand && i != offHand && !equipments[i].IsEmpty)
                     {
-                        if (!equipments[i].IsEmpty)
+                        int ammo = ItemHelper.GetMaximumAmmo(equipments[i].Item);
+                        if ((equipments[i].Item.Type == ItemObject.ItemTypeEnum.Arrows ||
+                             equipments[i].Item.Type == ItemObject.ItemTypeEnum.Bolts ||
+                             equipments[i].Item.Type == ItemObject.ItemTypeEnum.Bullets) && (i >= EquipmentIndex.Weapon0 && i <= EquipmentIndex.Weapon3))
                         {
-                            int ammo = ItemHelper.GetMaximumAmmo(equipments[i].Item);
-                            if ((equipments[i].Item.Type == ItemObject.ItemTypeEnum.Arrows ||
-                                equipments[i].Item.Type == ItemObject.ItemTypeEnum.Bolts ||
-                                equipments[i].Item.Type == ItemObject.ItemTypeEnum.Bullets) && (i >= EquipmentIndex.Weapon0 && i <= EquipmentIndex.Weapon3))
-                            {
-                                ammo = affectedAgent.Equipment[i].Amount;
-                            }
-                            if(random.Next(100) > this.DestroyChance || killedByFriendly)
-                            {
-                                lootInventory.ExpandInventoryWithItem(equipments[i].Item, 1, ammo);
-                            }
-                            else
-                            {
-                                InformationComponent.Instance.SendMessage("Your item " + equipments[i].Item.Name.ToString() + " was destroyed when you died", Color.ConvertStringToColor("#ff0000ff").ToUnsignedInteger(), player);
-                            }
+                            ammo = affectedAgent.Equipment[i].Amount;
                         }
+                        allItems.Add((equipments[i].Item, 1, ammo, true, i));
                     }
                 }
 
+                // Gather all items in player inventory slots
                 foreach (InventorySlot inventorySlot in playerInventory.Slots)
                 {
-                    if (inventorySlot.Item == null || inventorySlot.Count == 0) continue; 
-                   
-                    if(random.Next(100) > 5 || killedByFriendly)  // % 10 remove item
+                    if (inventorySlot.Item != null && inventorySlot.Count > 0)
                     {
-                        lootInventory.ExpandInventoryWithItem(inventorySlot.Item, inventorySlot.Count, inventorySlot.Ammo);
+                        allItems.Add((inventorySlot.Item, inventorySlot.Count, inventorySlot.Ammo, false, EquipmentIndex.None));
                     }
-                    else
+                }
+
+                // Select one random item to destroy
+                if (allItems.Count > 0)
+                {
+                    var itemToDestroy = allItems[random.Next(allItems.Count)];
+
+                    foreach (var item in allItems)
                     {
-                        InformationComponent.Instance.SendMessage("Your item " + inventorySlot.Item.Name.ToString() + " was destroyed when you died", Color.ConvertStringToColor("#ff0000ff").ToUnsignedInteger(), player);
+                        if (item == itemToDestroy)
+                        {
+                            // Destroy the selected item
+                            InformationComponent.Instance.SendMessage("Your item " + item.item.Name.ToString() + " was destroyed when you died",
+                                                                      Color.ConvertStringToColor("#ff0000ff").ToUnsignedInteger(), player);
+                        }
+                        else
+                        {
+                            // Transfer all other items to loot inventory
+                            lootInventory.ExpandInventoryWithItem(item.item, item.count, item.ammo);
+                        }
                     }
                 }
 

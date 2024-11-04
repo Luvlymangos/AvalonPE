@@ -73,7 +73,7 @@ namespace PersistentEmpiresSave.Database.Repositories
         {
             Debug.Print("[Save Module] UPDATING Cart TO DB (" + Cart != null ? " " + Cart.ID : "Cart IS NULL !)");
             DBCart dbcart = CreateDBCart(Cart);
-            string insertQuery = "UPDATE carts SET PosX = @PosX, PosY = @PosY, PosZ = @PosZ WHERE ID = @ID";
+            string insertQuery = "UPDATE carts SET PosX = @PosX, PosY = @PosY, PosZ = @PosZ, InventoryId = @InventoryID WHERE ID = @ID";
             DBConnection.Connection.Execute(insertQuery, dbcart);
             Debug.Print("[Save Module] UPDATED Cart TO DB (" + Cart != null ? " " + Cart.ID : "Cart IS NULL !)");
             return dbcart;

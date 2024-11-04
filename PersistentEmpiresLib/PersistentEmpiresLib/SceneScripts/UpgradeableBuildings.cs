@@ -288,8 +288,9 @@ namespace PersistentEmpiresLib.SceneScripts
             WeaponComponentData currentUsageItem = missionWeapon.CurrentUsageItem;
             if (attackerAgent == null) return false;
             NetworkCommunicator player = attackerAgent.MissionPeer.GetNetworkPeer();
+            PersistentEmpireRepresentative perp = player.GetComponent<PersistentEmpireRepresentative>();
             bool isAdmin = Main.IsPlayerAdmin(player);
-            if(isAdmin && missionWeapon.Item != null && missionWeapon.Item.StringId == "pe_adminhammer")
+            if(isAdmin && missionWeapon.Item != null && missionWeapon.Item.StringId == "pe_adminhammer" && Main.IsPlayerAdmin(player))
             {
                 if (this.CurrentTier < this.MaxTier)
                 {

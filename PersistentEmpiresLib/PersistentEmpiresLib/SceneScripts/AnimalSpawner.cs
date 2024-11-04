@@ -61,6 +61,10 @@ namespace PersistentEmpiresLib.SceneScripts
                 string[] inflictedReceipt = receipt.Split('*');
                 string receiptId = inflictedReceipt[0];
                 int count = int.Parse(inflictedReceipt[1]);
+                if (MBObjectManager.Instance.GetObject<ItemObject>(receiptId) == null)
+                {
+                    Debug.Print("Error With Animal Spawner! Item Not Found: " + receiptId);
+                }
                 parsedReceipt.Add(new Receipt(receiptId, count));
             }
             return parsedReceipt;

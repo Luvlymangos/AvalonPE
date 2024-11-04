@@ -211,7 +211,7 @@ namespace PersistentEmpiresLib.SceneScripts
                 if (persistentEmpireRepresentative == null) return false;
                 bool isAdmin = Main.IsPlayerAdmin(player);
 
-                if(missionWeapon.Item.StringId == "pe_adminhammer")
+                if(missionWeapon.Item.StringId == "pe_adminhammer" && Main.IsPlayerAdmin(player))
                 {
                     this.SetHitPoint(this.MaxHitPoint, impactDirection, attackerScriptComponentBehavior);
                     InformationComponent.Instance.SendMessage((this.HitPoint + this.RepairDamage).ToString() + "/" + this.MaxHitPoint + ", repaired", 0x02ab89d9, player);
