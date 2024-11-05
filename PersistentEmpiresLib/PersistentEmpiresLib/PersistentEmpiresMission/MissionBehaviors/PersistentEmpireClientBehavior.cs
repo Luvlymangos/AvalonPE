@@ -111,6 +111,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         {
             if (this._myRepresentative != null)
             {
+
                 KeyValuePair<string, int> skill = this._myRepresentative.GetSkill(message.Skill);
                 if (skill.Key != null)
                 {

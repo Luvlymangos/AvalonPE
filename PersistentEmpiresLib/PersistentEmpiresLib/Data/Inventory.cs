@@ -40,6 +40,22 @@ namespace PersistentEmpiresLib.Data
             this.TiedEntity = tiedEntity;
         }
 
+
+        public bool IsInventoryIncludesString(string item, int count)
+        {
+            int inventoryIncludesCount = 0;
+            foreach (InventorySlot slot in this.Slots)
+            {
+                if (slot.Item == null) continue;
+                if (slot.Item.StringId == item)
+                {
+                    inventoryIncludesCount += slot.Count;
+                    if (inventoryIncludesCount >= count) return true;
+                }
+            }
+            return false;
+        }
+
         public bool IsInventoryIncludes(ItemObject item, int count)
         {
             int inventoryIncludesCount = 0;

@@ -46,7 +46,7 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>false</Prefer32Bit>
-    <OutputPath>E:\SteamLibrary\steamapps\workshop\content\261550\3263813166\bin\Win64_Shipping_Client\</OutputPath>
+    <OutputPath>E:\SteamLibrary\steamapps\workshop\content\261550\3359655368\bin\Win64_Shipping_Client\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'ReleaseServer'">
     <ReferenceFolder>.\ServerReferences</ReferenceFolder>
@@ -224,6 +224,7 @@
     <Compile Include="NetworkMessages\Client\RequestTradingBuyItem.cs" />
     <Compile Include="NetworkMessages\Client\RequestTradingPrices.cs" />
     <Compile Include="NetworkMessages\Client\RequestTradingSellItem.cs" />
+    <Compile Include="NetworkMessages\Client\RequestUpdateSkills.cs" />
     <Compile Include="NetworkMessages\Client\SendBatchVoice.cs" />
     <Compile Include="NetworkMessages\Client\ShoutMessage.cs" />
     <Compile Include="NetworkMessages\Client\StartMovingBackwardMoveableMachine.cs" />
