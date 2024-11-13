@@ -1,5 +1,6 @@
 ﻿using PersistentEmpiresLib;
 using PersistentEmpiresLib.PersistentEmpiresMission;
+using PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace PersistentEmpires.Views.Views.AdminPanel
     public class PEAdminPlayerVM : ViewModel
     {
         private NetworkCommunicator playerPeer;
+        private AdminClientBehavior _adminbehaviour;
+        public Dictionary<string, int> LoadedSkills;
         private string _playerName;
         private string _factionName;
         private bool _isSelected;
@@ -33,19 +36,21 @@ namespace PersistentEmpires.Views.Views.AdminPanel
         {
             this.playerPeer = playerPeer;
             this.PlayerName = this.playerPeer.UserName;
+            _adminbehaviour = Mission.Current.GetMissionBehavior<AdminClientBehavior>();
             PersistentEmpireRepresentative persistentEmpireRepresentative = this.playerPeer.GetComponent<PersistentEmpireRepresentative>();
             try
             {
-                this.WeavingLevel = persistentEmpireRepresentative == null ? 0 : persistentEmpireRepresentative.LoadedSkills["Weaving"];
-                this.WeaponLevel = persistentEmpireRepresentative == null ? 0 : persistentEmpireRepresentative.LoadedSkills["WeaponSmithing"];
-                this.ArmourLevel = persistentEmpireRepresentative == null ? 0 : persistentEmpireRepresentative.LoadedSkills["ArmourSmithing"];
-                this.SmithingLevel = persistentEmpireRepresentative == null ? 0 : persistentEmpireRepresentative.LoadedSkills["BlackSmithing"];
-                this.CarpLevel = persistentEmpireRepresentative == null ? 0 : persistentEmpireRepresentative.LoadedSkills["Carpentry"];
-                this.CookingLevel = persistentEmpireRepresentative == null ? 0 : persistentEmpireRepresentative.LoadedSkills["Cooking"];
-                this.FarmingLevel = persistentEmpireRepresentative == null ? 0 : persistentEmpireRepresentative.LoadedSkills["Farming"];
-                this.MiningLevel = persistentEmpireRepresentative == null ? 0 : persistentEmpireRepresentative.LoadedSkills["Mining"];
-                this.FletchingLevel = persistentEmpireRepresentative == null ? 0 : persistentEmpireRepresentative.LoadedSkills["Fletching"];
-                this.AnimalsLevel = persistentEmpireRepresentative == null ? 0 : persistentEmpireRepresentative.LoadedSkills["Animals"];
+                LoadedSkills = DeserializeCraftingStats(_adminbehaviour.PlayerStats[playerPeer]);
+                this.WeavingLevel = LoadedSkills["Weaving"];
+                this.WeaponLevel = LoadedSkills["WeaponSmithing"];
+                this.ArmourLevel = LoadedSkills["ArmourSmithing"];
+                this.SmithingLevel = LoadedSkills["BlackSmithing"];
+                this.CarpLevel = LoadedSkills["Carpentry"];
+                this.CookingLevel = LoadedSkills["Cooking"];
+                this.FarmingLevel = LoadedSkills["Farming"];
+                this.MiningLevel = LoadedSkills["Mining"];
+                this.FletchingLevel = LoadedSkills["Fletching"];
+                this.AnimalsLevel = LoadedSkills["Animals"];
             }
             catch (Exception e)
             {
@@ -239,6 +244,28 @@ namespace PersistentEmpires.Views.Views.AdminPanel
                     base.OnPropertyChangedWithValue(value, "AnimalsLevel");
                 }
             }
+        }
+
+        public Dictionary<string, int> DeserializeCraftingStats(string serializedData)
+        {
+            Dictionary<string, int> deserializedSkills = new Dictionary<string, int>();
+
+            // Split by '=' to get each skill entry
+            var entries = serializedData.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var entry in entries)
+            {
+                // Split each entry by '*' to get the skill key and value
+                var parts = entry.Split('*');
+
+                if (parts.Length == 2 && int.TryParse(parts[1], out int skillValue))
+                {
+                    string skillKey = parts[0];
+                    deserializedSkills[skillKey] = skillValue;
+                }
+            }
+
+            return deserializedSkills;
         }
 
         public void ExecuteSelect()

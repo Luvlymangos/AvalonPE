@@ -56,16 +56,16 @@ namespace PersistentEmpires.Views.ViewsVM.AdminPanel
         }
         public override void RefreshValues()
         {
-            base.RefreshValues();
-            this.Players = new MBBindingList<PEAdminPlayerVM>();
-            foreach (NetworkCommunicator peer in GameNetwork.NetworkPeers)
-            {
-                this.Players.Add(new PEAdminPlayerVM(peer, (PEAdminPlayerVM selected) =>
+                base.RefreshValues();
+                this.Players = new MBBindingList<PEAdminPlayerVM>();
+                foreach (NetworkCommunicator peer in GameNetwork.NetworkPeers)
                 {
-                    this.SelectedPlayer = selected;
-                }));
-            }
-            base.OnPropertyChanged("FilteredPlayers");
+                    this.Players.Add(new PEAdminPlayerVM(peer, (PEAdminPlayerVM selected) =>
+                    {
+                        this.SelectedPlayer = selected;
+                    }));
+                }
+                base.OnPropertyChanged("FilteredPlayers");
         }
 
         [DataSourceProperty]

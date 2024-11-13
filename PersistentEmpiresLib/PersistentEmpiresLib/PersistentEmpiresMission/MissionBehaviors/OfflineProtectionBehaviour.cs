@@ -11,6 +11,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 {
     public class OfflineProtectionBehaviour : MissionNetwork
     {
+#if SERVER
         public bool IsOfflineProtectionActive = false;
         public int StartHour = 4;
         public int EndHour = 16;
@@ -70,5 +71,6 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 IsOfflineProtectionActive = false;
             }
         }
+#endif
     }
 }

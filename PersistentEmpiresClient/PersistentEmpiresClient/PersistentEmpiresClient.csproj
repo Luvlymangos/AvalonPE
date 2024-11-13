@@ -287,7 +287,6 @@
     <Compile Include="ViewsVM\AdminPanel\PEAdminMenuItemVM.cs" />
     <Compile Include="ViewsVM\AdminPanel\PEAdminPanelVM.cs" />
     <Compile Include="ViewsVM\AdminPanel\PEAdminPlayerManagementVM.cs" />
-    <Compile Include="ViewsVM\AdminPanel\PEAdminPlayerSkillVM.cs" />
     <Compile Include="ViewsVM\AdminPanel\PEAdminSkillPanelVM.cs" />
     <Compile Include="ViewsVM\AnimationMenu\PEAnimationSubMenuVM.cs" />
     <Compile Include="ViewsVM\AnimationMenu\PEAnimationVM.cs" />

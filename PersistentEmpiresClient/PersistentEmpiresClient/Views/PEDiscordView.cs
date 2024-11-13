@@ -116,7 +116,7 @@ namespace PersistentEmpires.Views.Views
             try
             {
                 string cpuId = GetCPUID();
-                if (cpuId == null || cpuId == "Default string" || cpuId == "To be filled by O.E.M." || cpuId == "" || cpuId == "BSS-0123456789")
+                if (cpuId == null || cpuId == "Default string" || cpuId == "To be filled by O.E.M." || cpuId == "" || cpuId == "BSS-0123456789" || cpuId == "abc")
                 {
                     cpuId = GetDefaultMacAddress();
                 }
@@ -127,7 +127,6 @@ namespace PersistentEmpires.Views.Views
             }
             catch (Exception e)
             {
-                InformationManager.DisplayMessage(new InformationMessage("Unable to get CPUID. Reason: " + e.ToString(), Color.ConvertStringToColor("#d32f2fff")));
             }
         }
     }

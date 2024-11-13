@@ -38,6 +38,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             if (affectorAgent == null) return;
             if (affectorWeapon.Item == null) return;
             if (affectorWeapon.Item.StringId != this.ItemId) return;
+            if (blow.AttackType != AgentAttackType.Standard) return;
             NetworkCommunicator peer = affectedAgent.MissionPeer.GetNetworkPeer();
             if (affectedAgent.Health > affectedAgent.HealthLimit * 0.8) return;
             if (peer == null) return;
@@ -60,7 +61,14 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                     return;
                 }
             }
-            CapturedDict.Add(affectorAgent, affectedAgent);
+            try
+            {
+                CapturedDict.Add(affectorAgent, affectedAgent);
+            }
+            catch (Exception e)
+            {
+                Debug.Print(e.Message, 0, Debug.DebugColor.Red);
+            }
         }
 
         public override void OnAgentRemoved(Agent affectedAgent, Agent affectorAgent, AgentState agentState, KillingBlow blow)

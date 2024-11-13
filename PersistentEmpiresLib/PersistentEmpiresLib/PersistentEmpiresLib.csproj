@@ -154,6 +154,7 @@
     <Compile Include="Database\DBEntities\DBCart.cs" />
     <Compile Include="Database\DBEntities\DBHouses.cs" />
     <Compile Include="Database\DBEntities\DBMoneyChest.cs" />
+    <Compile Include="Database\DBEntities\DBSkillLocks.cs" />
     <Compile Include="Database\DBEntities\DBWorkshops.cs" />
     <Compile Include="Data\House.cs" />
     <Compile Include="Main.cs" />
@@ -216,6 +217,7 @@
     <Compile Include="NetworkMessages\Client\RequestRevealItemBag.cs" />
     <Compile Include="NetworkMessages\Client\RequestRevealMoneyPouch.cs" />
     <Compile Include="NetworkMessages\Client\RequestSellItem.cs" />
+    <Compile Include="NetworkMessages\Client\RequestSkillLock.cs" />
     <Compile Include="NetworkMessages\Client\RequestStartEat.cs" />
     <Compile Include="NetworkMessages\Client\RequestStartPlaying.cs" />
     <Compile Include="NetworkMessages\Client\RequestStopEat.cs" />
@@ -289,6 +291,7 @@
     <Compile Include="NetworkMessages\Server\SendBatchVoiceToPlay.cs" />
     <Compile Include="NetworkMessages\Server\SendCraftingToClient.cs" />
     <Compile Include="NetworkMessages\Server\SendMarketToClient.cs" />
+    <Compile Include="NetworkMessages\Server\SendPlayerStatsToClient.cs" />
     <Compile Include="NetworkMessages\Server\ServerHandshake.cs" />
     <Compile Include="NetworkMessages\Server\SetAgentAnimation.cs" />
     <Compile Include="NetworkMessages\Server\SetDayTime.cs" />
@@ -320,6 +323,7 @@
     <Compile Include="NetworkMessages\Server\SyncObjectHitpointsForDestructibleWithItem.cs" />
     <Compile Include="NetworkMessages\Server\SyncObjectHitpointsPE.cs" />
     <Compile Include="NetworkMessages\Server\SyncPlants.cs" />
+    <Compile Include="NetworkMessages\Server\SyncSkillLocks.cs" />
     <Compile Include="NetworkMessages\Server\UpdateCastle.cs" />
     <Compile Include="NetworkMessages\Server\UpdateFactionFromServer.cs" />
     <Compile Include="NetworkMessages\Server\UpdateInventorySlot.cs" />

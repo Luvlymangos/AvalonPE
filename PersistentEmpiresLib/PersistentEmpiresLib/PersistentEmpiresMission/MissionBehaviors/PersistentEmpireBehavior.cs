@@ -55,6 +55,13 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
         // public static string ServerSignature = "";
 
+
+        public override void OnBehaviorInitialize()
+        {
+            base.OnBehaviorInitialize();
+            Debug.Print("Persistent Empire Behavior Initialized");
+        }
+
         public override void OnAgentMount(Agent agent)
         {
             base.OnAgentMount(agent);
@@ -182,6 +189,16 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 {
                     this.AdminOn--;
                 }
+                foreach (NetworkCommunicator player in GameNetwork.NetworkPeers)
+                {
+                    if (Main.IsPlayerAdmin(player))
+                    {
+                        if (persistentEmpireRepresentative == null) continue;
+                        GameNetwork.BeginModuleEventAsServer(player);
+                        GameNetwork.WriteMessage(new SendPlayerStatsToClient(persistentEmpireRepresentative.SerializeCraftingStats(), networkPeer, false));
+                        GameNetwork.EndModuleEventAsServer();
+                    }
+                }
             }
 
             if (saveSystemBehavior != null && persistentEmpireRepresentative != null && persistentEmpireRepresentative.IsFirstAgentSpawned)
@@ -205,7 +222,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             persistentEmpireRepresentative.SpawnTimer.Reset(Mission.Current.CurrentTime, (float)MissionLobbyComponent.GetSpawnPeriodDurationForPeer(peer.GetComponent<MissionPeer>()));
             if (persistentEmpireRepresentative.KickedFromFaction)
             {
-                persistentEmpireRepresentative.SetClass("pe_serf");
+                persistentEmpireRepresentative.SetClass("pe_peasant");
                 persistentEmpireRepresentative.KickedFromFaction = false;
             }
         }
@@ -227,10 +244,6 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             this._plantingBehaviour = base.Mission.GetMissionBehavior<PlantingBehaviour>();
             this._protectionBehaviour = base.Mission.GetMissionBehavior<OfflineProtectionBehaviour>();
             PersistentEmpireRepresentative persistentEmpireRepresentative = networkPeer.GetComponent<PersistentEmpireRepresentative>();
-            if (Main.IsPlayerAdmin(networkPeer))
-            {
-                this.AdminOn++;
-            }
             if (persistentEmpireRepresentative != null)
             {
                 if (persistentEmpireRepresentative.Gold <= 0)
@@ -246,6 +259,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
             if (GameNetwork.IsServer)
             {
+#if SERVER
                 InformationComponent.Instance.SendMessage("Your player id is " + networkPeer.VirtualPlayer.Id.ToString(), Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
                 if (_protectionBehaviour.IsOfflineProtectionActive)
                 {
@@ -255,18 +269,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 {
                     InformationComponent.Instance.SendMessage("Offline protection is not active", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
                 }
-                if (this.AdminOn == 1)
-                {
-                    InformationComponent.Instance.SendMessage("1 Admin is online", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
-                }
-                else if (this.AdminOn > 1)
-                {
-                    InformationComponent.Instance.SendMessage($"{this.AdminOn} Admin's are online", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
-                }
-                else
-                {
-                    InformationComponent.Instance.SendMessage("No Admin is online", Color.ConvertStringToColor("#FF0000FF").ToUnsignedInteger(), networkPeer);
-                }
+#endif
                 //SYNC FACTIONS
                 List<PE_CastleBanner> castleBanners = this._castlesBehavior.castles.Values.ToList();
                 for (int i = 0; i < this._factionsBehavior.Factions.Keys.ToList().Count; i++)
@@ -282,7 +285,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                         GameNetwork.EndModuleEventAsServer();
                     }
                 }
-                
+
                 
                 //SYNC BANNERS
                 foreach (PE_CastleBanner castleBanner in castleBanners)
@@ -384,6 +387,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 bool created;
                 SaveSystemBehavior.HandleCreatePlayerNameIfNotExists(networkPeer);
                 DBPlayer dbPlayer = SaveSystemBehavior.HandleGetOrCreatePlayer(networkPeer, out created);
+                DBSkillLocks skilllocks = SaveSystemBehavior.HandleCreateOrGetSkillLock(networkPeer);
                 Debug.Print(dbPlayer.FactionIndex.ToString());
                 if (!created)
                 {
@@ -474,6 +478,35 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                             persistentEmpireRepresentative.SyncCraftingStats(skill.Key);
                         }
                     }
+
+                    try
+                    {
+                        persistentEmpireRepresentative.LockedSkills.Add("Weaving", skilllocks.Weaving);
+                        persistentEmpireRepresentative.LockedSkills.Add("WeaponSmithing", skilllocks.WeaponSmithing);
+                        persistentEmpireRepresentative.LockedSkills.Add("ArmourSmithing", skilllocks.ArmourSmithing);
+                        persistentEmpireRepresentative.LockedSkills.Add("BlackSmithing", skilllocks.BlackSmithing);
+                        persistentEmpireRepresentative.LockedSkills.Add("Carpentry", skilllocks.Carpentry);
+                        persistentEmpireRepresentative.LockedSkills.Add("Cooking", skilllocks.Cooking);
+                        persistentEmpireRepresentative.LockedSkills.Add("Farming", skilllocks.Farming);
+                        persistentEmpireRepresentative.LockedSkills.Add("Mining", skilllocks.Mining);
+                        persistentEmpireRepresentative.LockedSkills.Add("Fletching", skilllocks.Fletching);
+                        persistentEmpireRepresentative.LockedSkills.Add("Animals", skilllocks.Animals);
+                        foreach (KeyValuePair<string, bool> skilllock in persistentEmpireRepresentative.LockedSkills)
+                        {
+                            GameNetwork.BeginModuleEventAsServer(networkPeer);
+                            GameNetwork.WriteMessage(new SyncSkillLocks(skilllock.Key, skilllock.Value));
+                            GameNetwork.EndModuleEventAsServer();
+                        }
+                    }
+                    catch
+                    {
+                        foreach (KeyValuePair<string, bool> skilllock in persistentEmpireRepresentative.LockedSkills)
+                        {
+                            GameNetwork.BeginModuleEventAsServer(networkPeer);
+                            GameNetwork.WriteMessage(new SyncSkillLocks(skilllock.Key, skilllock.Value));
+                            GameNetwork.EndModuleEventAsServer();
+                        }
+                    }
                     //SYNC HOUSE
                     foreach (var item in _houseBehavior.Houses)
                     {
@@ -482,6 +515,51 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                         {
                             persistentEmpireRepresentative.SetHouse(item.Value);
                         }
+                    }
+                    //SYNC ADMIN SHIT THIS IS HACKY AND I HATE IT
+
+                    if (Main.IsPlayerAdmin(networkPeer))
+                    { 
+                        foreach (NetworkCommunicator player in GameNetwork.NetworkPeers)
+                        {
+                            if (Main.IsPlayerAdmin(player) && player != networkPeer)
+                            {
+                                GameNetwork.BeginModuleEventAsServer(player);
+                                GameNetwork.WriteMessage(new SendPlayerStatsToClient(persistentEmpireRepresentative.SerializeCraftingStats(), networkPeer, true));
+                                GameNetwork.EndModuleEventAsServer();
+                            }
+                            PersistentEmpireRepresentative persistentEmpireRepresentative1 = player.GetComponent<PersistentEmpireRepresentative>();
+                            if (persistentEmpireRepresentative1 == null) continue;
+                            GameNetwork.BeginModuleEventAsServer(networkPeer);
+                            GameNetwork.WriteMessage(new SendPlayerStatsToClient(persistentEmpireRepresentative1.SerializeCraftingStats(), player, true));
+                            GameNetwork.EndModuleEventAsServer();
+                        }
+                            this.AdminOn++;
+                    }
+                    else
+                    {
+                        foreach (NetworkCommunicator player in GameNetwork.NetworkPeers)
+                        {
+                            if (Main.IsPlayerAdmin(player))
+                            {
+                                if (persistentEmpireRepresentative == null) continue;
+                                GameNetwork.BeginModuleEventAsServer(player);
+                                GameNetwork.WriteMessage(new SendPlayerStatsToClient(persistentEmpireRepresentative.SerializeCraftingStats(), networkPeer, true));
+                                GameNetwork.EndModuleEventAsServer();
+                            }
+                        }
+                    }
+                    if (this.AdminOn == 1)
+                    {
+                        InformationComponent.Instance.SendMessage("1 Admin is online", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
+                    }
+                    else if (this.AdminOn > 1)
+                    {
+                        InformationComponent.Instance.SendMessage($"{this.AdminOn} Admin's are online", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
+                    }
+                    else
+                    {
+                        InformationComponent.Instance.SendMessage("No Admin is online", Color.ConvertStringToColor("#FF0000FF").ToUnsignedInteger(), networkPeer);
                     }
 #endif
                 }
@@ -559,21 +637,21 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             }
 
             // LOAD Carts from DB
-            IEnumerable<DBCart> dbCarts = SaveSystemBehavior.HandleGetAllCarts();
-            if (dbCarts == null)
-            {
-                Debug.Print("DBCarts is null");
-            }
-            else
-            {
-                foreach (DBCart dbcart in dbCarts)
-                {
-                    MatrixFrame spawnFrame = new MatrixFrame(new Mat3(), new Vec3(dbcart.PosX, dbcart.PosY, dbcart.PosZ));
-                    MissionObject mObject = Mission.Current.CreateMissionObjectFromPrefab(dbcart.Prefab, spawnFrame);
-                    PE_AttachToAgent cart = mObject.GameEntity.GetFirstScriptOfType<PE_AttachToAgent>();
-                    cart.CreateFromServer(dbcart.Id, dbcart.InventoryID);
-                }
-            }
+            //IEnumerable<DBCart> dbCarts = SaveSystemBehavior.HandleGetAllCarts();
+            //if (dbCarts == null)
+            //{
+            //    Debug.Print("DBCarts is null");
+            //}
+            //else
+            //{
+            //    foreach (DBCart dbcart in dbCarts)
+            //    {
+            //        MatrixFrame spawnFrame = new MatrixFrame(new Mat3(), new Vec3(dbcart.PosX, dbcart.PosY, dbcart.PosZ));
+            //        MissionObject mObject = Mission.Current.CreateMissionObjectFromPrefab(dbcart.Prefab, spawnFrame);
+            //        PE_AttachToAgent cart = mObject.GameEntity.GetFirstScriptOfType<PE_AttachToAgent>();
+            //        cart.CreateFromServer(dbcart.Id, dbcart.InventoryID);
+            //    }
+            //}
 
             // LOAD StockpileMarkets from DB
             IEnumerable<DBStockpileMarket> dbStockpileMarkets = SaveSystemBehavior.HandleGetAllStockpileMarkets();

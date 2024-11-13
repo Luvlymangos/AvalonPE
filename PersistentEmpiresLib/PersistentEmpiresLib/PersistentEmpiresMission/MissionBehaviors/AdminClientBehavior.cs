@@ -12,6 +12,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
     {
         public delegate void AdminPanelClick();
         public event AdminPanelClick OnAdminPanelClick;
+        public Dictionary<NetworkCommunicator, string> PlayerStats = new Dictionary<NetworkCommunicator, string>();
 
         public void HandleAdminPanelClick()
         {
@@ -38,6 +39,26 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             if(GameNetwork.IsClient)
             {
                 networkMessageHandlerRegisterer.Register<AuthorizeAsAdmin>(this.HandleAuthorizeAsAdminFromServer);
+                networkMessageHandlerRegisterer.Register<SendPlayerStatsToClient>(this.HandleSendPlayerStatsToClient);
+            }
+        }
+
+        private void HandleSendPlayerStatsToClient(SendPlayerStatsToClient message)
+        {
+            if (message.joined)
+            {
+                if (!PlayerStats.ContainsKey(message.peer))
+                {
+                    PlayerStats.Add(message.peer, message.stats);
+                }
+                else
+                {
+                    PlayerStats[message.peer] = message.stats;
+                }
+            }
+            else
+            {
+                PlayerStats.Remove(message.peer);
             }
         }
 

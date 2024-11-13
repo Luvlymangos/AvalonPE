@@ -11,6 +11,7 @@ using TaleWorlds.Library;
 using PersistentEmpiresLib;
 using TaleWorlds.MountAndBlade;
 using PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors;
+using PersistentEmpiresLib.NetworkMessages.Client;
 
 namespace PersistentEmpires.Views.ViewsVM
 {
@@ -37,8 +38,20 @@ namespace PersistentEmpires.Views.ViewsVM
         private int _farminglevel;
         private int _mininglevel;
         private int _fletchinglevel;
-        private int _animalslevel;
-
+        private int _animallevel;
+        private int _totallevel;
+        private string _weavinglock;
+        private string _weaponlock;
+        private string _armourlock;
+        private string _smithinglock;
+        private string _carplock;
+        private string _cookinglock;
+        private string _farminglock;
+        private string _mininglock;
+        private string _fletchinglock;
+        private string _animalslock;
+        public int TestLevel;
+        public string TestLock;
         public PECraftingStationVM(Action<PEItemVM> handleClickItem) {
             this._handleClickItem = handleClickItem;
         }
@@ -131,6 +144,82 @@ namespace PersistentEmpires.Views.ViewsVM
         {
             this._craft(obj); 
         }
+
+        public void ExecuteWeaving()
+        {
+            GameNetwork.BeginModuleEventAsClient();
+            GameNetwork.WriteMessage(new RequestSkillLocks("Weaving"));
+            GameNetwork.EndModuleEventAsClient();
+        }
+
+        public void ExecuteWeapon()
+        {
+            GameNetwork.BeginModuleEventAsClient();
+            GameNetwork.WriteMessage(new RequestSkillLocks("WeaponSmithing"));
+            GameNetwork.EndModuleEventAsClient();
+        }
+
+        public void ExecuteArmour()
+        {
+            GameNetwork.BeginModuleEventAsClient();
+            GameNetwork.WriteMessage(new RequestSkillLocks("ArmourSmithing"));
+            GameNetwork.EndModuleEventAsClient();
+        }
+
+        public void ExecuteSmithing()
+        {
+            GameNetwork.BeginModuleEventAsClient();
+            GameNetwork.WriteMessage(new RequestSkillLocks("BlackSmithing"));
+            GameNetwork.EndModuleEventAsClient();
+        }
+
+        public void ExecuteCarpentry()
+        {
+            GameNetwork.BeginModuleEventAsClient();
+            GameNetwork.WriteMessage(new RequestSkillLocks("Carpentry"));
+            GameNetwork.EndModuleEventAsClient();
+        }
+
+        public void ExecuteCooking()
+        {
+            GameNetwork.BeginModuleEventAsClient();
+            GameNetwork.WriteMessage(new RequestSkillLocks("Cooking"));
+            GameNetwork.EndModuleEventAsClient();
+        }
+
+        public void ExecuteFarming()
+        {
+            GameNetwork.BeginModuleEventAsClient();
+            GameNetwork.WriteMessage(new RequestSkillLocks("Farming"));
+            GameNetwork.EndModuleEventAsClient();
+        }
+
+        public void ExecuteMining()
+        {
+            GameNetwork.BeginModuleEventAsClient();
+            GameNetwork.WriteMessage(new RequestSkillLocks("Mining"));
+            GameNetwork.EndModuleEventAsClient();
+        }
+
+        public void ExecuteFletching()
+        {
+            GameNetwork.BeginModuleEventAsClient();
+            GameNetwork.WriteMessage(new RequestSkillLocks("Fletching"));
+            GameNetwork.EndModuleEventAsClient();
+        }
+
+        public void ExecuteAnimals()
+        {
+            GameNetwork.BeginModuleEventAsClient();
+            GameNetwork.WriteMessage(new RequestSkillLocks("Animals"));
+            GameNetwork.EndModuleEventAsClient();
+        }
+
+
+
+
+
+
 
         [DataSourceProperty]
         public int PastDuration
@@ -246,6 +335,21 @@ namespace PersistentEmpires.Views.ViewsVM
         }
 
         [DataSourceProperty]
+        public int TotalLevel
+        {
+            get => this._totallevel;
+            set
+            {
+                if (value != this._totallevel)
+                {
+                    this._totallevel = value;
+                    base.OnPropertyChangedWithValue(value, "TotalLevel");
+                }
+            }
+        }
+        
+
+        [DataSourceProperty]
         public int CookingLevel
         {
             get => this._cookinglevel;
@@ -304,16 +408,150 @@ namespace PersistentEmpires.Views.ViewsVM
         [DataSourceProperty]
         public int AnimalLevel
         {
-            get => this._animalslevel;
+            get => this._animallevel;
             set
             {
-                if (value != this._animalslevel)
+                if (value != this._animallevel)
                 {
-                    this._animalslevel = value;
+                    this._animallevel = value;
                     base.OnPropertyChangedWithValue(value, "AnimalsLevel");
                 }
             }
         }
+
+        [DataSourceProperty]
+        public string WeaponLock
+        {
+            get => this._weaponlock;
+            set
+            {
+                if (value != this._weaponlock)
+                {
+                    this._weaponlock = value;
+                    base.OnPropertyChangedWithValue(value, "WeaponLock");
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public string WeavingLock
+        {
+            get => this._weavinglock;
+            set
+            {
+                if (value != this._weavinglock)
+                {
+                    this._weavinglock = value;
+                    base.OnPropertyChangedWithValue(value, "WeavingLock");
+                }
+            }
+        }
+
+        public string ArmourLock
+        {
+            get => this._armourlock;
+            set
+            {
+                if (value != this._armourlock)
+                {
+                    this._armourlock = value;
+                    base.OnPropertyChangedWithValue(value, "ArmourLock");
+                }
+            }
+        }
+
+        public string SmithingLock
+        {
+            get => this._smithinglock;
+            set
+            {
+                if (value != this._smithinglock)
+                {
+                    this._smithinglock = value;
+                    base.OnPropertyChangedWithValue(value, "SmithingLock");
+                }
+            }
+        }
+
+        public string CarpLock
+        {
+            get => this._carplock;
+            set
+            {
+                if (value != this._carplock)
+                {
+                    this._carplock = value;
+                    base.OnPropertyChangedWithValue(value, "CarpLock");
+                }
+            }
+        }
+
+        public string CookingLock
+        {
+            get => this._cookinglock;
+            set
+            {
+                if (value != this._cookinglock)
+                {
+                    this._cookinglock = value;
+                    base.OnPropertyChangedWithValue(value, "CookingLock");
+                }
+            }
+        }
+
+        public string FarmingLock
+        {
+            get => this._farminglock;
+            set
+            {
+                if (value != this._farminglock)
+                {
+                    this._farminglock = value;
+                    base.OnPropertyChangedWithValue(value, "FarmingLock");
+                }
+            }
+        }
+
+        public string MiningLock
+        {
+            get => this._mininglock;
+            set
+            {
+                if (value != this._mininglock)
+                {
+                    this._mininglock = value;
+                    base.OnPropertyChangedWithValue(value, "MiningLock");
+                }
+            }
+        }
+
+        public string FletchingLock
+        {
+            get => this._fletchinglock;
+            set
+            {
+                if (value != this._fletchinglock)
+                {
+                    this._fletchinglock = value;
+                    base.OnPropertyChangedWithValue(value, "FletchingLock");
+                }
+            }
+        }
+
+        public string AnimalLock
+        {
+            get => this._animalslock;
+            set
+            {
+                if (value != this._animalslock)
+                {
+                    this._animalslock = value;
+                    base.OnPropertyChangedWithValue(value, "AnimalsLock");
+                }
+            }
+        }
+
+
 
 
 

@@ -225,7 +225,11 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
             if (skillLevel > 900)
             {
-                if (roll < 0.001) craftedTier = Tier.Mythic;
+                if (roll < 0.001) 
+                {
+                    InformationComponent.Instance.BroadcastAnnouncement("A Mythic Item has been crafted!");
+                    craftedTier = Tier.Mythic; 
+                }
                 else if (roll < 0.15) craftedTier = Tier.Legendary;
                 else if (roll < 0.30) craftedTier = Tier.Epic;
                 else if (roll < 0.50) craftedTier = Tier.Rare;
@@ -284,7 +288,9 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 craftable.CraftableItem.ItemType == ItemObject.ItemTypeEnum.Pistol ||
                 craftable.CraftableItem.ItemType == ItemObject.ItemTypeEnum.Crossbow ||
                 craftable.CraftableItem.ItemType == ItemObject.ItemTypeEnum.Shield) &&
-                craftable.CraftableItem.StringId != "AvalonHCRP_Grabber";
+                craftable.CraftableItem.StringId != "AvalonHCRP_Grabber" &&
+                craftable.CraftableItem.StringId != "pe_banner" &&
+                craftable.CraftableItem.StringId != "pe_lockpick";
         }
 
         public bool IsArmour(Craftable craftable)
@@ -328,12 +334,27 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 #if SERVER
             else
             {
+                networkMessageHandlerRegisterer.Register<RequestSkillLocks>(this.HandleRequestSkillLocks);
                 networkMessageHandlerRegisterer.Register<RequestExecuteCraft>(this.HandleRequestExecuteCraftFromClient);
 
             }
 #endif
         }
 
+        private bool HandleRequestSkillLocks(NetworkCommunicator player, RequestSkillLocks message)
+        {
+            PersistentEmpireRepresentative perp = player.GetComponent<PersistentEmpireRepresentative>();
+            if (perp != null)
+            {
+                perp.LockedSkills[message.Skillname] = !perp.LockedSkills[message.Skillname];
+                SaveSystemBehavior.HandleCreateOrSaveSkillLock(player);
+                GameNetwork.BeginModuleEventAsServer(player);
+                GameNetwork.WriteMessage(new SyncSkillLocks(message.Skillname, perp.LockedSkills[message.Skillname]));
+                GameNetwork.EndModuleEventAsServer();
+                return true;
+            }
+            return false;
+        }
         private void HandleCraftingCompletedFromServer(CraftingCompleted message)
         {
             // Stop the animation here

@@ -131,7 +131,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             base.OnMissionTick(dt);
             if (DateTimeOffset.Now.ToUnixTimeSeconds() > this.LastSaveAt + this.SaveDuration)
             {
-                this.AutoSaveAllMarkets();
+                //this.AutoSaveAllMarkets();
                 this.LastSaveAt = DateTimeOffset.Now.ToUnixTimeSeconds();
             }
         }
@@ -146,6 +146,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             {
                 this.OnStockpileMarketUpdate(stockpileMarket, message.ItemIndex, message.NewStock);
             }
+            SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
         }
 
 
@@ -222,6 +223,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             // SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
             this.UpdateStockForPeers(stockpileMarket, message.ItemIndex);
             // Send a message to update ui
+            SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
             return true;
         }
 
@@ -284,12 +286,18 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
         private bool HandleRequestSellItemFromClient(NetworkCommunicator peer, RequestSellItem message)
         {
+            
             PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
             if (persistentEmpireRepresentative == null) return false;
             PE_StockpileMarket stockpileMarket = (PE_StockpileMarket)message.StockpileMarket;
             if (peer.ControlledAgent == null || peer.ControlledAgent.IsActive() == false) return false;
             if (peer.ControlledAgent.Position.Distance(stockpileMarket.GameEntity.GlobalPosition) > stockpileMarket.Distance) return false;
             MarketItem marketItem = stockpileMarket.MarketItems[message.ItemIndex];
+            if (marketItem.Stock >= marketItem.MaxStock)
+            {
+                InformationComponent.Instance.SendMessage("This Stockpile is full of that item!", new Color(1f, 0, 0).ToUnsignedInteger(), peer);
+                return false;
+            }
 
             if (marketItem.Item.StringId.StartsWith("Common_"))
             {
@@ -315,7 +323,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 marketItem.UpdateReserve(marketItem.Stock + 1);
                 // SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
                 this.UpdateStockForPeers(stockpileMarket, message.ItemIndex);
-
+                SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
 
                 return true;
             }
@@ -364,7 +372,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             // SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
             this.UpdateStockForPeers(stockpileMarket, message.ItemIndex);
 
-
+            SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
             return true;
         }
 

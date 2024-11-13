@@ -40,7 +40,7 @@ namespace PersistentEmpiresLib
         public bool IsLordClass = false;
         public int SkillCap = 1000;
         public Dictionary<string, int> LoadedSkills = new Dictionary<string, int>();
-
+        public Dictionary<string,bool> LockedSkills = new Dictionary<string, bool>();
 
         public int[] LoadedAmmo { get; set; }
 
@@ -63,85 +63,260 @@ namespace PersistentEmpiresLib
             }
             return new KeyValuePair<string, int>();
         }
-        //TODO: Crashes Server
-        public KeyValuePair<string, int> GetNextHighestSkill()
+
+        float GetDiminishingFactor(int skillLevel)
+        {
+            float maxSkill = 1000.0f; // Maximum skill level
+            float minFactor = 0.20f;  // Minimum factor (1% of skill gained)
+
+            // Calculate the diminishing factor with a minimum threshold
+            float diminishingFactor2 = 1.0f - (float)Math.Pow(skillLevel / maxSkill, 0.5f);
+
+            // Ensure it does not drop below the minimum factor
+            return Math.Max(diminishingFactor2, minFactor);
+        }
+
+        public KeyValuePair<string, int> GetRandomSkillExcluding(string excludeSkillName)
         {
             // Check if LoadedSkills is empty
             if (LoadedSkills.Count == 0)
             {
-                // Return a default value or throw an exception based on your needs
                 return new KeyValuePair<string, int>("", 0);
             }
 
-            // Find the maximum skill
-            var maximum = LoadedSkills.Aggregate((l, r) => l.Value > r.Value ? l : r);
+            // Filter out the skill that matches the exclusion name, those with a value of 0, and locked skills
+            var eligibleSkills = LoadedSkills
+                .Where(x => x.Key != excludeSkillName && x.Value > 0 && (!LockedSkills.ContainsKey(x.Key) || !LockedSkills[x.Key]))
+                .ToList();
 
-            // Find the second maximum skill safely
-            var secondMaximum = LoadedSkills
-                .Where(x => x.Value < maximum.Value)
-                .DefaultIfEmpty(new KeyValuePair<string, int>("", 0)) // Provide a default if no second max is found
-                .Aggregate((l, r) => l.Value > r.Value ? l : r);
+            // Return default if no eligible skill is found
+            if (eligibleSkills.Count == 0)
+            {
+                return new KeyValuePair<string, int>("", 0);
+            }
 
-            return secondMaximum;
+            // Select a random skill from the eligible skills
+            Random random = new Random();
+            int randomIndex = random.Next(eligibleSkills.Count);
+            return eligibleSkills[randomIndex];
+        }
+
+        public void DisplaySkillmessage(string skillName, int amount, bool increase)
+        {
+            if (increase)
+            {
+                InformationComponent.Instance.SendMessage($"{skillName}: {LoadedSkills[skillName]} + {amount}", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), this.GetNetworkPeer());
+            }
+            else
+            {
+                InformationComponent.Instance.SendMessage($"{skillName}: {LoadedSkills[skillName]} - {amount}", Color.ConvertStringToColor("#FF5733FF").ToUnsignedInteger(), this.GetNetworkPeer());
+            }
         }
 
         public bool IncreaseSkilllevel(string skillName, int amount)
         {
+            if (!this.LoadedSkills.ContainsKey(skillName)) return false;
+            KeyValuePair<string, int> skill = GetSkill(skillName);
+            float diminishingFactor = GetDiminishingFactor(skill.Value);
+            int GainAmount = (int)(amount * diminishingFactor);
+
+            int totalSkills = 0;
+
+            foreach (int skillValue in LoadedSkills.Values)
+            {
+                totalSkills += skillValue;
+            }
+
+            if (LoadedSkills[skillName] >= 1000)
+            {
+                LoadedSkills[skillName] = 1000;
+                this.SyncCraftingStats(skillName);
+            }
+
+            totalSkills = 0;
+            foreach (int skillValue in LoadedSkills.Values)
+            {
+                totalSkills += skillValue;
+            }
+
+            //Correct for Previous Bad Code
+            if (totalSkills > SkillCap)
+            {
+                InformationComponent.Instance.SendMessage($"You are over the skill cap, the system will now correct this issue!", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), this.GetNetworkPeer());
+                while (totalSkills > SkillCap)
+                {
+                    totalSkills = 0;
+                    foreach (int skillValue in LoadedSkills.Values)
+                    {
+                        totalSkills += skillValue;
+                    }
+                    KeyValuePair<string, int>  SkillToDrop = GetRandomSkillExcluding(skillName);
+                    if (SkillToDrop.Key == "") break;
+                    int AmountToDrop = totalSkills - SkillCap;
+                    if (AmountToDrop > LoadedSkills[SkillToDrop.Key])
+                    {
+                        LoadedSkills[SkillToDrop.Key] = SkillToDrop.Value - SkillToDrop.Value;
+                        this.SyncCraftingStats(SkillToDrop.Key);
+                        DisplaySkillmessage(SkillToDrop.Key, SkillToDrop.Value, false);
+                    }
+                    else
+                    {
+                        LoadedSkills[SkillToDrop.Key] = SkillToDrop.Value - AmountToDrop;
+                        this.SyncCraftingStats(SkillToDrop.Key);
+                        DisplaySkillmessage(SkillToDrop.Key, AmountToDrop, false);
+                    }
+
+                }
+            }
+
+            //Increase Skill Level
+            if (LockedSkills.ContainsKey(skillName) && LockedSkills[skillName]) return false;
+            if (LoadedSkills[skillName] == 1000) return false;
+            totalSkills = 0;
+            foreach (int skillValue in LoadedSkills.Values)
+            {
+                totalSkills += skillValue;
+            }
+            if (totalSkills + GainAmount > SkillCap)
+            {
+                if (GetRandomSkillExcluding(skillName).Key == "")
+                {
+                    InformationComponent.Instance.SendMessage("All Skills are locked or at 0, Unable to increase skill points!", Color.ConvertStringToColor("#FF5733FF").ToUnsignedInteger(), this.GetNetworkPeer());
+                    return false;
+                }
+                LoadedSkills[skillName] = LoadedSkills[skillName] + GainAmount;
+                this.SyncCraftingStats(skillName);
+                DisplaySkillmessage(skillName, GainAmount, true);
+                int DropAmount = GainAmount;
+
+                while (DropAmount > 0)
+                {
+                    KeyValuePair<string, int> SkillToDrop = GetRandomSkillExcluding(skillName);
+                    if (SkillToDrop.Key == "") break;
+                    
+                    if (LoadedSkills[SkillToDrop.Key] < DropAmount)
+                    {
+                        DropAmount = DropAmount - LoadedSkills[SkillToDrop.Key];
+                        DisplaySkillmessage(SkillToDrop.Key, LoadedSkills[SkillToDrop.Key], false);
+                        LoadedSkills[SkillToDrop.Key] = 0;
+                        this.SyncCraftingStats(SkillToDrop.Key);
+                    }
+                    else
+                    {
+                        LoadedSkills[SkillToDrop.Key] = LoadedSkills[SkillToDrop.Key] - DropAmount;
+                        DisplaySkillmessage(SkillToDrop.Key, DropAmount, false);
+                        this.SyncCraftingStats(SkillToDrop.Key);
+                        DropAmount = 0;
+                    }
+                }
+                return true;
+                
+
+
+            }
+            else
+            {
+                LoadedSkills[skillName] = LoadedSkills[skillName] + GainAmount;
+                this.SyncCraftingStats(skillName);
+                DisplaySkillmessage(skillName, GainAmount, true);
+                return true;
+            }
+
+
+
+
+        }
+
+
+        public bool IncreaseSkilllevel2(string skillName, int amount)
+        {
             if (this.LoadedSkills.ContainsKey(skillName))
             {
-                KeyValuePair<string, int> skill = GetSkill(skillName);
-                int currentSkill = skill.Value;
-                // Define the diminishing returns function
-                float GetDiminishingFactor(int skillLevel)
+                try
                 {
-                    float maxSkill = 1000.0f; // Maximum skill level
-                    float minFactor = 0.20f;  // Minimum factor (1% of skill gained)
+                    KeyValuePair<string, int> skill = GetSkill(skillName);
+                    int currentSkill = skill.Value;
 
-                    // Calculate the diminishing factor with a minimum threshold
-                    float diminishingFactor2 = 1.0f - (float)Math.Pow(skillLevel / maxSkill, 0.5f);
-
-                    // Ensure it does not drop below the minimum factor
-                    return Math.Max(diminishingFactor2, minFactor);
-                }
-
-                // Apply diminishing returns
-                float diminishingFactor = GetDiminishingFactor(currentSkill);
-                amount = (int)(amount * diminishingFactor);
-                if (amount<= 0)
-                {
-                    amount = 1;
-                }
-                int newSkill = currentSkill + amount;
-
-                // Ensure the skill level does not exceed SkillCap
-                if (newSkill <= SkillCap)
-                {
-                    LoadedSkills[skillName] = newSkill;
-                    this.SyncCraftingStats(skillName);
-                    InformationComponent.Instance.SendMessage($"{skillName}: {LoadedSkills[skillName]} + {amount}", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), this.GetNetworkPeer());
-                    return true;
-                }
-                else
-                {
-                    KeyValuePair<string, int> droppedSkill = GetNextHighestSkill();
+                    // Apply diminishing returns
+                    float diminishingFactor = GetDiminishingFactor(currentSkill);
+                    amount = (int)(amount * diminishingFactor);
+                    if (amount <= 0)
                     {
-                        newSkill = SkillCap;
+                        amount = 1;
                     }
-                    LoadedSkills[skillName] = newSkill;
-                    this.SyncCraftingStats(skillName);
-                    InformationComponent.Instance.SendMessage($"{skillName}: {LoadedSkills[skillName]} + {amount}", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), this.GetNetworkPeer());
-                    LoadedSkills[droppedSkill.Key] = droppedSkill.Value - amount;
-                    if (LoadedSkills[droppedSkill.Key] < 0) LoadedSkills[droppedSkill.Key] = 0;
-                    this.SyncCraftingStats(droppedSkill.Key);
-                    if (droppedSkill.Value > 0)
-                        InformationComponent.Instance.SendMessage($"{droppedSkill.Key}: {LoadedSkills[droppedSkill.Key]} - {amount}", Color.ConvertStringToColor("#FF5733FF").ToUnsignedInteger(), this.GetNetworkPeer());
+                    int totalSkills = 0;
+
+                    foreach (int skillValue in LoadedSkills.Values)
+                    {
+                        totalSkills += skillValue;
+                    }
+                    int newSkill = currentSkill + amount;
+
+
+
+                    // Ensure the skill level does not exceed SkillCap
+                    if (totalSkills + amount <= SkillCap)
+                    {
+                        LoadedSkills[skillName] = newSkill;
+                        this.SyncCraftingStats(skillName);
+                        InformationComponent.Instance.SendMessage($"{skillName}: {LoadedSkills[skillName]} + {amount}", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), this.GetNetworkPeer());
+                        return true;
+                    }
                     else
-                        InformationComponent.Instance.SendMessage($"{droppedSkill.Key}: {LoadedSkills[droppedSkill.Key]}", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), this.GetNetworkPeer());
-                    return true;
+                    {
+                        KeyValuePair<string, int> droppedSkill = GetRandomSkillExcluding(skillName);
+                        LoadedSkills[skillName] = newSkill;
+                        this.SyncCraftingStats(skillName);
+                        InformationComponent.Instance.SendMessage($"{skillName}: {LoadedSkills[skillName]} + {amount}", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), this.GetNetworkPeer());
+                        LoadedSkills[droppedSkill.Key] = droppedSkill.Value - amount;
+                        if (LoadedSkills[droppedSkill.Key] < 0) LoadedSkills[droppedSkill.Key] = 0;
+                        this.SyncCraftingStats(droppedSkill.Key);
+                        if (droppedSkill.Value > 0)
+                            InformationComponent.Instance.SendMessage($"{droppedSkill.Key}: {LoadedSkills[droppedSkill.Key]} - {amount}", Color.ConvertStringToColor("#FF5733FF").ToUnsignedInteger(), this.GetNetworkPeer());
+                        else
+                            InformationComponent.Instance.SendMessage($"{droppedSkill.Key}: {LoadedSkills[droppedSkill.Key]}", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), this.GetNetworkPeer());
+
+
+                        totalSkills = 0;
+                        foreach (int skillValue in LoadedSkills.Values)
+                        {
+                            totalSkills += skillValue;
+                        }
+
+                        if (totalSkills > SkillCap)
+                        {
+                            InformationComponent.Instance.SendMessage($"Unfortunatly, your skills have exceeded the Maximum, the system will now correct them!", Color.ConvertStringToColor("#FF5733FF").ToUnsignedInteger(), this.GetNetworkPeer());
+                            KeyValuePair<string, int> droppedSkill2 = GetRandomSkillExcluding(skillName);
+                            int Amounttodrop = totalSkills - SkillCap;
+                            if (Amounttodrop > LoadedSkills[droppedSkill2.Key])
+                            {
+                                LoadedSkills[droppedSkill2.Key] = droppedSkill2.Value - droppedSkill2.Value;
+                                this.SyncCraftingStats(droppedSkill2.Key);
+                                InformationComponent.Instance.SendMessage($"{droppedSkill2.Key}: {LoadedSkills[droppedSkill2.Key]} - {droppedSkill2.Value}", Color.ConvertStringToColor("#FF5733FF").ToUnsignedInteger(), this.GetNetworkPeer());
+                            }
+                            else
+                            {
+                                LoadedSkills[droppedSkill2.Key] = droppedSkill2.Value - Amounttodrop;
+                                this.SyncCraftingStats(droppedSkill2.Key);
+                                InformationComponent.Instance.SendMessage($"{droppedSkill2.Key}: {LoadedSkills[droppedSkill2.Key]} - {Amounttodrop}", Color.ConvertStringToColor("#FF5733FF").ToUnsignedInteger(), this.GetNetworkPeer());
+                            }
+
+                        }
+
+
+                        return true;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    Debug.Print("Error with crafting skill gain");
                 }
             }
             return false;
         }
+
+
 
         public PE_SpawnFrame GetNextSpawnFrame()
         {
@@ -244,10 +419,29 @@ namespace PersistentEmpiresLib
             }
         }
 
+        public string SerializeCraftingStats()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var skill in LoadedSkills)
+            {
+                sb.Append(skill.Key + "*" + skill.Value + "=");
+            }
+            return sb.ToString();
+        }
+
         public void SyncCraftingStats(string skill)
         {
             if (GameNetwork.IsServer)
             {
+                foreach(NetworkCommunicator peer in GameNetwork.NetworkPeers)
+                {
+                    if (Main.IsPlayerAdmin(peer))
+                    {
+                        GameNetwork.BeginModuleEventAsServer(peer);
+                        GameNetwork.WriteMessage(new SendPlayerStatsToClient(this.SerializeCraftingStats(), this.GetNetworkPeer(), true));
+                        GameNetwork.EndModuleEventAsServer();
+                    }
+                }
                 int amount = LoadedSkills[skill];
                 GameNetwork.BeginModuleEventAsServer(this.GetNetworkPeer());
                 GameNetwork.WriteMessage(new SyncCraftingStats(skill, amount));

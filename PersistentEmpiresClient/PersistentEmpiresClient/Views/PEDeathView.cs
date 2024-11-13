@@ -206,36 +206,36 @@ namespace PersistentEmpires.Views.Views
                     this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
                     this.UpdateSelection(this._selectedCastle, this._selectedIndex);
                 }
-                if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.D1))
-                {
-                    this._selectedIndex = 0;
-                    this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
-                    this.UpdateSelection(this._selectedCastle, this._selectedIndex);
-                }
-                else if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.D2))
-                {
-                    this._selectedIndex = 1;
-                    this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
-                    this.UpdateSelection(this._selectedCastle, this._selectedIndex);
-                }
-                else if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.D3))
-                {
-                    this._selectedIndex = 2;
-                    this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
-                    this.UpdateSelection(this._selectedCastle, this._selectedIndex);
-                }
-                else if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.D4))
-                {
-                    this._selectedIndex = 3;
-                    this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
-                    this.UpdateSelection(this._selectedCastle, this._selectedIndex);
-                }
-                else if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.D5))
-                {
-                    this._selectedIndex = 4;
-                    this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
-                    this.UpdateSelection(this._selectedCastle, this._selectedIndex);
-                }
+                //if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.D1))
+                //{
+                //    this._selectedIndex = 0;
+                //    this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
+                //    this.UpdateSelection(this._selectedCastle, this._selectedIndex);
+                //}
+                //else if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.D2))
+                //{
+                //    this._selectedIndex = 1;
+                //    this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
+                //    this.UpdateSelection(this._selectedCastle, this._selectedIndex);
+                //}
+                //else if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.D3))
+                //{
+                //    this._selectedIndex = 2;
+                //    this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
+                //    this.UpdateSelection(this._selectedCastle, this._selectedIndex);
+                //}
+                //else if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.D4))
+                //{
+                //    this._selectedIndex = 3;
+                //    this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
+                //    this.UpdateSelection(this._selectedCastle, this._selectedIndex);
+                //}
+                //else if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.D5))
+                //{
+                //    this._selectedIndex = 4;
+                //    this._selectedIndex = CorrectSelectedIndex(this._selectedCastle, this._selectedIndex);
+                //    this.UpdateSelection(this._selectedCastle, this._selectedIndex);
+                //}
             }
         }
 
