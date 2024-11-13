@@ -46,7 +46,7 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>false</Prefer32Bit>
-    <OutputPath>E:\SteamLibrary\steamapps\workshop\content\261550\3263813166\bin\Win64_Shipping_Client\</OutputPath>
+    <OutputPath>E:\SteamLibrary\steamapps\workshop\content\261550\3359655368\bin\Win64_Shipping_Client\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'ReleaseServer'">
     <ReferenceFolder>.\ServerReferences</ReferenceFolder>
@@ -154,6 +154,7 @@
     <Compile Include="Database\DBEntities\DBCart.cs" />
     <Compile Include="Database\DBEntities\DBHouses.cs" />
     <Compile Include="Database\DBEntities\DBMoneyChest.cs" />
+    <Compile Include="Database\DBEntities\DBSkillLocks.cs" />
     <Compile Include="Database\DBEntities\DBWorkshops.cs" />
     <Compile Include="Data\House.cs" />
     <Compile Include="Main.cs" />
@@ -216,6 +217,7 @@
     <Compile Include="NetworkMessages\Client\RequestRevealItemBag.cs" />
     <Compile Include="NetworkMessages\Client\RequestRevealMoneyPouch.cs" />
     <Compile Include="NetworkMessages\Client\RequestSellItem.cs" />
+    <Compile Include="NetworkMessages\Client\RequestSkillLock.cs" />
     <Compile Include="NetworkMessages\Client\RequestStartEat.cs" />
     <Compile Include="NetworkMessages\Client\RequestStartPlaying.cs" />
     <Compile Include="NetworkMessages\Client\RequestStopEat.cs" />
@@ -224,6 +226,7 @@
     <Compile Include="NetworkMessages\Client\RequestTradingBuyItem.cs" />
     <Compile Include="NetworkMessages\Client\RequestTradingPrices.cs" />
     <Compile Include="NetworkMessages\Client\RequestTradingSellItem.cs" />
+    <Compile Include="NetworkMessages\Client\RequestUpdateSkills.cs" />
     <Compile Include="NetworkMessages\Client\SendBatchVoice.cs" />
     <Compile Include="NetworkMessages\Client\ShoutMessage.cs" />
     <Compile Include="NetworkMessages\Client\StartMovingBackwardMoveableMachine.cs" />
@@ -288,6 +291,7 @@
     <Compile Include="NetworkMessages\Server\SendBatchVoiceToPlay.cs" />
     <Compile Include="NetworkMessages\Server\SendCraftingToClient.cs" />
     <Compile Include="NetworkMessages\Server\SendMarketToClient.cs" />
+    <Compile Include="NetworkMessages\Server\SendPlayerStatsToClient.cs" />
     <Compile Include="NetworkMessages\Server\ServerHandshake.cs" />
     <Compile Include="NetworkMessages\Server\SetAgentAnimation.cs" />
     <Compile Include="NetworkMessages\Server\SetDayTime.cs" />
@@ -319,6 +323,7 @@
     <Compile Include="NetworkMessages\Server\SyncObjectHitpointsForDestructibleWithItem.cs" />
     <Compile Include="NetworkMessages\Server\SyncObjectHitpointsPE.cs" />
     <Compile Include="NetworkMessages\Server\SyncPlants.cs" />
+    <Compile Include="NetworkMessages\Server\SyncSkillLocks.cs" />
     <Compile Include="NetworkMessages\Server\UpdateCastle.cs" />
     <Compile Include="NetworkMessages\Server\UpdateFactionFromServer.cs" />
     <Compile Include="NetworkMessages\Server\UpdateInventorySlot.cs" />

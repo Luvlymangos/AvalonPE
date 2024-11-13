@@ -560,11 +560,11 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 this._informationComponent.SendAnnouncementToPlayer("You already declared a war to this faction", player);
                 return false;
             }
-            if(FactionDeclaredWarLast.ContainsKey(playerFactionIndex) && DateTimeOffset.UtcNow.ToUnixTimeSeconds() < FactionDeclaredWarLast[playerFactionIndex] + WarDeclareTimeOut)
-            {
-                this._informationComponent.SendMessage("Please wait 30 sec to declare a new war.", new Color(1f,0f,0f).ToUnsignedInteger(), player);
-                return false;
-            }
+            //if(FactionDeclaredWarLast.ContainsKey(playerFactionIndex) && DateTimeOffset.UtcNow.ToUnixTimeSeconds() < FactionDeclaredWarLast[playerFactionIndex] + WarDeclareTimeOut)
+            //{
+            //    this._informationComponent.SendMessage("Please wait 30 sec to declare a new war.", new Color(1f,0f,0f).ToUnsignedInteger(), player);
+            //    return false;
+            //}
             FactionDeclaredWarLast[playerFactionIndex] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             f.warDeclaredTo.Add(message.FactionIndex);
             GameNetwork.BeginBroadcastModuleEvent();
@@ -601,11 +601,11 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 this._informationComponent.SendAnnouncementToPlayer("You didn't declared a war.", player);
                 return false;
             }
-            if (FactionDeclaredWarLast.ContainsKey(playerFactionIndex) && DateTimeOffset.UtcNow.ToUnixTimeSeconds() < FactionDeclaredWarLast[playerFactionIndex] + PeaceDeclareTimeOut)
-            {
-                this._informationComponent.SendMessage("Please wait 30 secs to declare a peace.", new Color(1f, 0f, 0f).ToUnsignedInteger(), player);
-                return false;
-            }
+            //if (FactionDeclaredWarLast.ContainsKey(playerFactionIndex) && DateTimeOffset.UtcNow.ToUnixTimeSeconds() < FactionDeclaredWarLast[playerFactionIndex] + PeaceDeclareTimeOut)
+            //{
+            //    this._informationComponent.SendMessage("Please wait 30 secs to declare a peace.", new Color(1f, 0f, 0f).ToUnsignedInteger(), player);
+            //    return false;
+            //}
             FactionDeclaredWarLast[playerFactionIndex] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             f.warDeclaredTo.Remove(message.FactionIndex);
             GameNetwork.BeginBroadcastModuleEvent();

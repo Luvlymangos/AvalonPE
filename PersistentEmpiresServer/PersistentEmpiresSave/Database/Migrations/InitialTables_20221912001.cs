@@ -159,6 +159,18 @@ namespace PersistentEmpiresSave.Database.Migrations
                 .WithColumn("Prefab").AsString()
                 .WithColumn("InventoryId").AsString();
 
+            Create.Table("skillslocks")
+                .WithColumn("Id").AsString()
+                .WithColumn("Weaving").AsBoolean().WithDefaultValue(false)
+                .WithColumn("WeaponSmithing").AsBoolean().WithDefaultValue(false)
+                .WithColumn("ArmourSmithing").AsBoolean().WithDefaultValue(false)
+                .WithColumn("BlackSmithing").AsBoolean().WithDefaultValue(false)
+                .WithColumn("Carpentry").AsBoolean().WithDefaultValue(false)
+                .WithColumn("Cooking").AsBoolean().WithDefaultValue(false)
+                .WithColumn("Farming").AsBoolean().WithDefaultValue(false)
+                .WithColumn("Mining").AsBoolean().WithDefaultValue(false)
+                .WithColumn("Fletching").AsBoolean().WithDefaultValue(false)
+                .WithColumn("Animals").AsBoolean().WithDefaultValue(false);
 
         }
     }

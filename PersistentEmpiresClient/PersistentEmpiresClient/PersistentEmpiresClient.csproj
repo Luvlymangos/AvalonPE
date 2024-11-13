@@ -40,7 +40,7 @@
     <DefineConstants>TRACE;DEBUG;CLIENT</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <OutputPath>E:\SteamLibrary\steamapps\workshop\content\261550\3263813166\bin\Win64_Shipping_Client\</OutputPath>
+    <OutputPath>E:\SteamLibrary\steamapps\workshop\content\261550\3359655368\bin\Win64_Shipping_Client\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -269,6 +269,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SentryForView.cs" />
     <Compile Include="ViewHandler.cs" />
+    <Compile Include="ViewsVM\AdminPanel\Buttons\SkillSet.cs" />
     <Compile Include="ViewsVM\AdminPanel\Buttons\UnWound.cs" />
     <Compile Include="ViewsVM\AdminPanel\Buttons\PEAdminButtonVM.cs" />
     <Compile Include="ViewsVM\AdminPanel\Buttons\Heal.cs" />
@@ -286,6 +287,7 @@
     <Compile Include="ViewsVM\AdminPanel\PEAdminMenuItemVM.cs" />
     <Compile Include="ViewsVM\AdminPanel\PEAdminPanelVM.cs" />
     <Compile Include="ViewsVM\AdminPanel\PEAdminPlayerManagementVM.cs" />
+    <Compile Include="ViewsVM\AdminPanel\PEAdminSkillPanelVM.cs" />
     <Compile Include="ViewsVM\AnimationMenu\PEAnimationSubMenuVM.cs" />
     <Compile Include="ViewsVM\AnimationMenu\PEAnimationVM.cs" />
     <Compile Include="ViewsVM\CraftingStation\PECraftingReceiptVM.cs" />
@@ -334,6 +336,7 @@
     <Compile Include="Views\AdminPanel\PEAdminPanelView.cs" />
     <Compile Include="Views\AdminPanel\PEAdminPlayerManagementView.cs" />
     <Compile Include="ViewsVM\AdminPanel\PEAdminPlayerVM.cs" />
+    <Compile Include="Views\AdminPanel\PEAdminSkillView.cs" />
     <Compile Include="Views\FactionManagement\PEFactionAssignMarshall.cs" />
     <Compile Include="Views\FactionManagement\PEFactionChangeBanner.cs" />
     <Compile Include="Views\FactionManagement\PEFactionChangeName.cs" />

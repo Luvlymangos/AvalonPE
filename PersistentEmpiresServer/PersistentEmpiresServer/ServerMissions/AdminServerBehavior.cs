@@ -179,7 +179,32 @@ namespace PersistentEmpiresServer.ServerMissions
                 networkMessageHandlerRegisterer.Register<RequestAdminGold>(this.HandleRequestAdminGold);
                 networkMessageHandlerRegisterer.Register<RequestBecameGodlike>(this.HandleRequestBecameGodlike);
                 networkMessageHandlerRegisterer.Register<AdminChat>(this.HandleAdminChatFromServer);
+                networkMessageHandlerRegisterer.Register<RequestUpdateSkills>(this.HandleSkillChangeFromClient);
             }
+        }
+
+        private bool HandleSkillChangeFromClient(NetworkCommunicator player, RequestUpdateSkills message)
+        {
+            PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
+            if (!persistentEmpireRepresentative.IsAdmin)
+            {
+                return false;
+            }
+            if (message.Id == null)
+            {
+                return false;
+            }
+            if (message.Id.ControlledAgent == null || !message.Id.ControlledAgent.IsActive())
+            {
+                InformationComponent.Instance.SendMessage("Target is not spawned yet", new Color(1f, 0f, 0f).ToUnsignedInteger(), player);
+                return false;
+            }
+            Debug.Print($"Skill Change requested {message.Skill} - {message.Value}");
+            PersistentEmpireRepresentative perp = message.Id.GetComponent<PersistentEmpireRepresentative>();
+            perp.LoadedSkills[message.Skill] = message.Value;
+            perp.SyncCraftingStats(message.Skill);
+            SaveSystemBehavior.HandleCreateOrSavePlayer(message.Id);
+            return true;
         }
 
         private bool HandleAdminChatFromServer(NetworkCommunicator player, AdminChat message)

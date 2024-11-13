@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.Core;
+using TaleWorlds.ObjectSystem;
 
 namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 {
@@ -129,7 +131,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             base.OnMissionTick(dt);
             if (DateTimeOffset.Now.ToUnixTimeSeconds() > this.LastSaveAt + this.SaveDuration)
             {
-                this.AutoSaveAllMarkets();
+                //this.AutoSaveAllMarkets();
                 this.LastSaveAt = DateTimeOffset.Now.ToUnixTimeSeconds();
             }
         }
@@ -144,6 +146,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             {
                 this.OnStockpileMarketUpdate(stockpileMarket, message.ItemIndex, message.NewStock);
             }
+            SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
         }
 
 
@@ -220,6 +223,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             // SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
             this.UpdateStockForPeers(stockpileMarket, message.ItemIndex);
             // Send a message to update ui
+            SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
             return true;
         }
 
@@ -248,16 +252,82 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 }
             }
         }
+
+        public ItemObject QualityCheck(string ItemId, PersistentEmpireRepresentative perp)
+        {
+            Inventory inventory = perp.GetInventory();
+            if (inventory.IsInventoryIncludesString($"Common_{ItemId}",1))
+            {
+                return MBObjectManager.Instance.GetObject<ItemObject>($"Common_{ItemId}"); ;
+            }
+            if (inventory.IsInventoryIncludesString($"Uncommon_{ItemId}", 1))
+            {
+                return MBObjectManager.Instance.GetObject<ItemObject>($"Uncommon_{ItemId}"); ;
+            }
+            if (inventory.IsInventoryIncludesString($"Rare_{ItemId}", 1))
+            {
+                return MBObjectManager.Instance.GetObject<ItemObject>($"Rare_{ItemId}"); ;
+            }
+            if (inventory.IsInventoryIncludesString($"Epic_{ItemId}", 1))
+            {
+                return MBObjectManager.Instance.GetObject<ItemObject>($"Epic_{ItemId}"); ;
+            }
+            if (inventory.IsInventoryIncludesString($"Legendary_{ItemId}", 1))
+            {
+                return MBObjectManager.Instance.GetObject<ItemObject>($"Legendary_{ItemId}"); ;
+            }
+            if (inventory.IsInventoryIncludesString($"Mythic_{ItemId}", 1))
+            {
+                return MBObjectManager.Instance.GetObject<ItemObject>($"Mythic_{ItemId}"); ;
+            }
+            return null;
+
+        }
+
         private bool HandleRequestSellItemFromClient(NetworkCommunicator peer, RequestSellItem message)
         {
+            
             PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
             if (persistentEmpireRepresentative == null) return false;
             PE_StockpileMarket stockpileMarket = (PE_StockpileMarket)message.StockpileMarket;
             if (peer.ControlledAgent == null || peer.ControlledAgent.IsActive() == false) return false;
             if (peer.ControlledAgent.Position.Distance(stockpileMarket.GameEntity.GlobalPosition) > stockpileMarket.Distance) return false;
             MarketItem marketItem = stockpileMarket.MarketItems[message.ItemIndex];
+            if (marketItem.Stock >= marketItem.MaxStock)
+            {
+                InformationComponent.Instance.SendMessage("This Stockpile is full of that item!", new Color(1f, 0, 0).ToUnsignedInteger(), peer);
+                return false;
+            }
 
-            if (!persistentEmpireRepresentative.GetInventory().IsInventoryIncludes(marketItem.Item, 1))
+            if (marketItem.Item.StringId.StartsWith("Common_"))
+            {
+                string itemStringId = marketItem.Item.StringId.Replace("Common_", "");
+                ItemObject newitem = QualityCheck(itemStringId, persistentEmpireRepresentative);
+                if (newitem == null)
+                {
+                    InformationComponent.Instance.SendMessage("You don't have that item in your inventory", new Color(1f, 0, 0).ToUnsignedInteger(), peer);
+                    return false;
+                }
+                List<int> updatedSlots2 = persistentEmpireRepresentative.GetInventory().RemoveCountedItemSynced(newitem, 1);
+                foreach (int i in updatedSlots2)
+                {
+                    GameNetwork.BeginModuleEventAsServer(peer);
+                    GameNetwork.WriteMessage(new UpdateInventorySlot("PlayerInventory_" + i, persistentEmpireRepresentative.GetInventory().Slots[i].Item, persistentEmpireRepresentative.GetInventory().Slots[i].Count));
+                    GameNetwork.EndModuleEventAsServer();
+                }
+                persistentEmpireRepresentative.GoldGain(marketItem.SellPrice());
+                // if (marketItem.Stock > 1000) marketItem.Stock = 1000;
+                // LoggerHelper.LogAnAction(peer, LogAction.PlayerSellsStockpile, null, new object[] {
+                //     marketItem
+                // });
+                marketItem.UpdateReserve(marketItem.Stock + 1);
+                // SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
+                this.UpdateStockForPeers(stockpileMarket, message.ItemIndex);
+                SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
+
+                return true;
+            }
+            else if (!persistentEmpireRepresentative.GetInventory().IsInventoryIncludes(marketItem.Item, 1))
             {
                 InformationComponent.Instance.SendMessage("You don't have that item in your inventory", new Color(1f, 0, 0).ToUnsignedInteger(), peer);
                 return false;
@@ -302,7 +372,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             // SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
             this.UpdateStockForPeers(stockpileMarket, message.ItemIndex);
 
-
+            SaveSystemBehavior.HandleCreateOrSaveStockpileMarket(stockpileMarket);
             return true;
         }
 

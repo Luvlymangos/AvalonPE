@@ -1,6 +1,4 @@
-﻿using Org.BouncyCastle.Math.EC;
-using PersistentEmpiresLib.Helpers;
-using PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors;
+﻿using PersistentEmpiresLib.Helpers;
 using PersistentEmpiresLib.SceneScripts.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -20,19 +18,16 @@ namespace PersistentEmpiresLib.SceneScripts
     public class PE_AttachToAgent : PE_UsableFromDistance, IStray
     {
         // public override ScriptComponentBehavior.TickRequirement GetTickRequirement() => !this.GameEntity.IsVisibleIncludeParents() ? base.GetTickRequirement() : ScriptComponentBehavior.TickRequirement.Tick | ScriptComponentBehavior.TickRequirement.TickParallel;
-        public static Random random;
-        public string ID = "ABC";
+
         public bool AttachableToHorse = false;
         public string AttachableHorseType = "";
         public int StrayDurationSeconds = 7200;
         private long WillBeDeletedAt = 0;
         public string ParticleEffectOnDestroy = "";
         public string SoundEffectOnDestroy = "";
-        private Vec3 previousPosition;
+
         public float MaxHitPoint = 500f;
         protected float _hitPoint;
-        public string AttachedInventoryID = "ABC";
-        protected long lastsaved = 0;
 
         public float HitPoint
         {
@@ -60,29 +55,6 @@ namespace PersistentEmpiresLib.SceneScripts
             }
             return base.GetTickRequirement();
         }
-        public void SetInventoryID(string inventoryID)
-        {
-            foreach (GameEntity child in this.GameEntity.GetChildren())
-            {
-                if (child.HasScriptOfType<PE_InventoryEntity>())
-                {
-                    PE_InventoryEntity inv = child.GetFirstScriptOfType<PE_InventoryEntity>();
-                    inv.InventoryId = inventoryID;
-                    this.AttachedInventoryID = inventoryID;
-                }
-            }
-        }
-
-        public void SetID(string id)
-        {
-            this.ID = id;
-        }
-
-        public void CreateFromServer(string id, string inventoryID)
-        {
-            SetInventoryID(inventoryID);
-            SetID(id);
-        }
 
         protected override void OnTick(float dt)
         {
@@ -93,6 +65,7 @@ namespace PersistentEmpiresLib.SceneScripts
                 return;
             }
             GameEntity parentEntity = base.GameEntity.Parent;
+
             MatrixFrame frame = parentEntity.GetGlobalFrame();
             frame.rotation = this.AttachedTo.Frame.rotation;
             frame.Rotate(270f * (MBMath.PI / 180), Vec3.Up);
@@ -124,17 +97,6 @@ namespace PersistentEmpiresLib.SceneScripts
 
 
             parentEntity.SetGlobalFrame(frame);
-            if (GameNetwork.IsServer)
-            {
-
-                if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - this.lastsaved > 60)
-                {
-                    this.lastsaved = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                    SaveSystemBehavior.HandleCreateOrSaveCart(this);
-                }
-            }
-
-
         }
 
         public void ResetStrayDuration()
@@ -145,11 +107,6 @@ namespace PersistentEmpiresLib.SceneScripts
         protected override void OnInit()
         {
             base.OnInit();
-            if (PE_AttachToAgent.random == null)
-            {
-                PE_AttachToAgent.random = new Random();
-            }
-            this.ID = GenerateId();
             base.ActionMessage = new TextObject("Attach Object");
             TextObject descriptionMessage = new TextObject("Press {KEY} To Attach");
             descriptionMessage.SetTextVariable("KEY", HyperlinkTexts.GetKeyHyperlinkText(HotKeyManager.GetHotKeyId("CombatHotKeyCategory", 13)));
@@ -163,18 +120,6 @@ namespace PersistentEmpiresLib.SceneScripts
             prop.SetValue(synchObject, syncFlags);
             base.IsInstantUse = true;
             this.HitPoint = this.MaxHitPoint;
-            foreach (GameEntity child in this.GameEntity.GetChildren())
-            {
-                if (child.HasScriptOfType<PE_InventoryEntity>())
-                {
-                    PE_InventoryEntity inv = child.GetFirstScriptOfType<PE_InventoryEntity>();
-                    this.AttachedInventoryID = inv.InventoryId;
-                }
-            }
-            if (GameNetwork.IsServer)
-            {
-                SaveSystemBehavior.HandleCreateOrSaveCart(this);
-            }
         }
         public override bool IsDisabledForAgent(Agent agent)
         {
@@ -221,7 +166,6 @@ namespace PersistentEmpiresLib.SceneScripts
             this.ResetStrayDuration();
             this.AttachedTo = attachableAgent;
         }
-
 
         public override string GetDescriptionText(GameEntity gameEntity = null)
         {
@@ -281,13 +225,5 @@ namespace PersistentEmpiresLib.SceneScripts
 
             return false;
         }
-
-        private string GenerateId()
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            Random random = PE_AttachToAgent.random;
-            return new string(Enumerable.Repeat(chars, 12).Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
     }
 }

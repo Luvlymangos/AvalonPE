@@ -54,6 +54,7 @@ namespace PersistentEmpires.Views
             list.Add(new PEAdminPlayerManagementView());
             list.Add(new PEAdminItemPanelView());
             list.Add(new PEAdminFactionView());
+            list.Add(new PEAdminSkillView());
             list.Add(new PEAdminGoldView());
             list.Add(new PEBannerRenderConsumer());
             list.Add(new PEMarkersView());

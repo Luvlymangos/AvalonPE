@@ -210,43 +210,51 @@ namespace PersistentEmpiresLib.SceneScripts
             if (this.GameEntity == null || this.InteractionEntity == null) return;
 
             NetworkCommunicator player = userAgent.MissionPeer.GetNetworkPeer();
+            if (player == null) return;
             bool canUserUse = true;
-            if (this.CastleId > -1)
+            try
             {
-                canUserUse = false;
-                Faction f = this.GetCastleBanner().GetOwnerFaction();
-                if (f.chestManagers.Contains(player.VirtualPlayer.Id.ToString()) || f.marshalls.Contains(player.VirtualPlayer.Id.ToString()) || f.lordId == player.VirtualPlayer.Id.ToString()) canUserUse = true;
-                PE_RepairableDestructableComponent destructComponent = base.GameEntity.GetFirstScriptOfType<PE_RepairableDestructableComponent>();
-                if (destructComponent != null && destructComponent.IsBroken) canUserUse = true;
-                ErrorMessage = $"This chest is locked by {f.name}";
-                SkillObject AdminSkill = MBObjectManager.Instance.GetObject<SkillObject>("Athletics");
-                if (userAgent.Character.GetSkillValue(AdminSkill) > 300)
+                if (this.CastleId > -1)
                 {
-                    canUserUse = true;
-                }
-                if (GameNetwork.IsServer)
-                {
-                    if (this.HouseChest)
+                    canUserUse = false;
+                    Faction f = this.GetCastleBanner().GetOwnerFaction();
+                    if (f.chestManagers.Contains(player.VirtualPlayer.Id.ToString()) || f.marshalls.Contains(player.VirtualPlayer.Id.ToString()) || f.lordId == player.VirtualPlayer.Id.ToString()) canUserUse = true;
+                    PE_RepairableDestructableComponent destructComponent = base.GameEntity.GetFirstScriptOfType<PE_RepairableDestructableComponent>();
+                    if (destructComponent != null && destructComponent.IsBroken) canUserUse = true;
+                    ErrorMessage = $"This chest is locked by {f.name}";
+                    SkillObject AdminSkill = MBObjectManager.Instance.GetObject<SkillObject>("Athletics");
+                    if (userAgent.Character.GetSkillValue(AdminSkill) > 300)
                     {
-                        HouseBehviour house = Mission.Current.GetMissionBehavior<HouseBehviour>();
-                        if (userAgent.MissionPeer.GetComponent<PersistentEmpireRepresentative>().GetHouse() == house.Houses[this.HouseIndex] || house.Houses[this.HouseIndex].marshalls.Contains(userAgent.MissionPeer.Peer.Id.ToString()))
-                        {
-                            canUserUse = true;
-                        }
-                        else
-                        {
-                            ErrorMessage = $"This chest is owned by someone else!";
-                            canUserUse = false;
-                        }
+                        canUserUse = true;
                     }
-                    if (!canUserUse)
+                    if (GameNetwork.IsServer)
                     {
-                        InformationComponent.Instance.SendMessage(ErrorMessage, 0x0606c2d9, player);
-                        return;
+                        if (this.HouseChest)
+                        {
+                            HouseBehviour house = Mission.Current.GetMissionBehavior<HouseBehviour>();
+                            if (userAgent.MissionPeer.GetComponent<PersistentEmpireRepresentative>().GetHouse() == house.Houses[this.HouseIndex] || house.Houses[this.HouseIndex].marshalls.Contains(userAgent.MissionPeer.Peer.Id.ToString()))
+                            {
+                                canUserUse = true;
+                            }
+                            else
+                            {
+                                ErrorMessage = $"This chest is owned by someone else!";
+                                canUserUse = false;
+                            }
+                        }
+                        if (!canUserUse)
+                        {
+                            InformationComponent.Instance.SendMessage(ErrorMessage, 0x0606c2d9, player);
+                            return;
+                        }
                     }
                 }
             }
-            
+            catch (Exception e)
+            {
+                Debug.Print(e.Message);
+                return;
+            }
             if (GameNetwork.IsServer)
             {
                 MatrixFrame globalFrame = base.GameEntity.GetGlobalFrame();

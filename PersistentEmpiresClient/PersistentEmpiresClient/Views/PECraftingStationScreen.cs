@@ -59,6 +59,11 @@ namespace PersistentEmpires.Views.Views
             {
                 try
                 {
+                    int totalSkills = 0;
+                    foreach (int skillValue in myRepresentative.LoadedSkills.Values)
+                    {
+                        totalSkills += skillValue;
+                    }
                     this._dataSource.WeaponLevel = myRepresentative.LoadedSkills["WeaponSmithing"];
                     this._dataSource.WeavingLevel = myRepresentative.LoadedSkills["Weaving"];
                     this._dataSource.ArmourLevel = myRepresentative.LoadedSkills["ArmourSmithing"];
@@ -69,6 +74,20 @@ namespace PersistentEmpires.Views.Views
                     this._dataSource.MiningLevel = myRepresentative.LoadedSkills["Mining"];
                     this._dataSource.FletchingLevel = myRepresentative.LoadedSkills["Fletching"];
                     this._dataSource.AnimalLevel = myRepresentative.LoadedSkills["Animals"];
+                    this._dataSource.TestLevel = myRepresentative.LoadedSkills["Animals"];
+                    this._dataSource.TotalLevel = totalSkills;
+                    this._dataSource.WeaponLock = myRepresentative.LockedSkills["WeaponSmithing"] ? "locked" : "unlocked";
+                    this._dataSource.WeavingLock = myRepresentative.LockedSkills["Weaving"] ? "locked" : "unlocked";
+                    this._dataSource.ArmourLock = myRepresentative.LockedSkills["ArmourSmithing"] ? "locked" : "unlocked";
+                    this._dataSource.SmithingLock = myRepresentative.LockedSkills["BlackSmithing"] ? "locked" : "unlocked";
+                    this._dataSource.CarpLock = myRepresentative.LockedSkills["Carpentry"] ? "locked" : "unlocked";
+                    this._dataSource.CookingLock = myRepresentative.LockedSkills["Cooking"] ? "locked" : "unlocked";
+                    this._dataSource.FarmingLock = myRepresentative.LockedSkills["Farming"] ? "locked" : "unlocked";
+                    this._dataSource.MiningLock = myRepresentative.LockedSkills["Mining"] ? "locked" : "unlocked";
+                    this._dataSource.FletchingLock = myRepresentative.LockedSkills["Fletching"] ? "locked" : "unlocked";
+                    this._dataSource.AnimalLock = myRepresentative.LockedSkills["Animals"] ? "locked" : "unlocked";
+                    this._dataSource.TestLock = myRepresentative.LockedSkills["Animals"] ? "locked" : "unlocked";
+
                 }
                 catch (Exception e)
                 {
@@ -103,6 +122,9 @@ namespace PersistentEmpires.Views.Views
             this._gauntletLayer = null;
 
         }
+
+ 
+
         private void OnOpen(PE_CraftingStation craftingStation, Inventory playerInventory)
         {
             if (this.IsActive) return;
@@ -118,6 +140,11 @@ namespace PersistentEmpires.Views.Views
             PersistentEmpireRepresentative myRepresentative = GameNetwork.MyPeer.GetComponent<PersistentEmpireRepresentative>();
             try
             {
+                int totalSkills = 0;
+                foreach (int skillValue in myRepresentative.LoadedSkills.Values)
+                {
+                    totalSkills += skillValue;
+                }
                 this._dataSource.WeaponLevel = myRepresentative.LoadedSkills["WeaponSmithing"];
                 this._dataSource.WeavingLevel = myRepresentative.LoadedSkills["Weaving"];
                 this._dataSource.ArmourLevel = myRepresentative.LoadedSkills["ArmourSmithing"];
@@ -128,9 +155,22 @@ namespace PersistentEmpires.Views.Views
                 this._dataSource.MiningLevel = myRepresentative.LoadedSkills["Mining"];
                 this._dataSource.FletchingLevel = myRepresentative.LoadedSkills["Fletching"];
                 this._dataSource.AnimalLevel = myRepresentative.LoadedSkills["Animals"];
+                this._dataSource.TotalLevel = totalSkills;
+                this._dataSource.WeaponLock = myRepresentative.LockedSkills["WeaponSmithing"] ? "locked" : "unlocked";
+                this._dataSource.WeavingLock = myRepresentative.LockedSkills["Weaving"] ? "locked" : "unlocked";
+                this._dataSource.ArmourLock = myRepresentative.LockedSkills["ArmourSmithing"] ? "locked" : "unlocked";
+                this._dataSource.SmithingLock = myRepresentative.LockedSkills["BlackSmithing"] ? "locked" : "unlocked";
+                this._dataSource.CarpLock = myRepresentative.LockedSkills["Carpentry"] ? "locked" : "unlocked";
+                this._dataSource.CookingLock = myRepresentative.LockedSkills["Cooking"] ? "locked" : "unlocked";
+                this._dataSource.FarmingLock = myRepresentative.LockedSkills["Farming"] ? "locked" : "unlocked";
+                this._dataSource.MiningLock = myRepresentative.LockedSkills["Mining"] ? "locked" : "unlocked";
+                this._dataSource.FletchingLock = myRepresentative.LockedSkills["Fletching"] ? "locked" : "unlocked";
+                this._dataSource.AnimalLock = myRepresentative.LockedSkills["Animals"] ? "locked" : "unlocked";
             }
             catch (Exception e)
             {
+                Debug.PrintError("Error in PECraftingStationScreen: " + e.Message);
+                Debug.Print("Error in PECraftingStationScreen: " + e.Message);
             }
             ScreenManager.TrySetFocus(this._gauntletLayer);
             this.IsActive = true;

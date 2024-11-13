@@ -159,16 +159,22 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             reportDamage = false;
             OfflineProtectionBehaviour offlineProtectionBehaviour = Mission.Current.GetMissionBehavior<OfflineProtectionBehaviour>();
-            if (offlineProtectionBehaviour.IsOfflineProtectionActive && offlineProtectionBehaviour != null)
+#if SERVER
+            if (GameNetwork.IsServer)
             {
-                InformationComponent.Instance.SendMessage("Offline protection is active", 0x02ab89d9, attackerAgent.MissionPeer.GetNetworkPeer());
-                PE_RepairableDestructableComponent destructComponent = base.GameEntity.GetFirstScriptOfType<PE_RepairableDestructableComponent>();
-                if (destructComponent != null)
+                if (offlineProtectionBehaviour.IsOfflineProtectionActive && offlineProtectionBehaviour != null)
                 {
-                    destructComponent.SetHitPoint(destructComponent.HitPoint + damage, impactDirection, attackerScriptComponentBehavior);
+                    InformationComponent.Instance.SendMessage("Offline protection is active", 0x02ab89d9, attackerAgent.MissionPeer.GetNetworkPeer());
+                    PE_RepairableDestructableComponent destructComponent = base.GameEntity.GetFirstScriptOfType<PE_RepairableDestructableComponent>();
+                    if (destructComponent != null)
+                    {
+                        destructComponent.SetHitPoint(destructComponent.HitPoint + damage, impactDirection, attackerScriptComponentBehavior);
+                        return false;
+                    }
                 }
-                return false;
+                
             }
+#endif
             if (this.Lockpickable == false) return false;
             if (this.CastleId == -1) return false;
 

@@ -65,7 +65,8 @@ namespace PersistentEmpiresSave
             DBMoneyChestRepository.Initialize();
             DBHouseRepository.Initialize();
             DBWorkshopRepository.Initialize();
-            DBCartRepository.Initialize();
+            //DBCartRepository.Initialize();
+            DBSkillLockRepository.Initialize();
 
             Debug.Print("[Persistent Empires Save System] Initialization Done !");
         }

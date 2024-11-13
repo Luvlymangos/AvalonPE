@@ -82,14 +82,16 @@ namespace PersistentEmpiresServer.ServerMissions
                 InformationComponent.Instance.BroadcastMessage("(A) " + networkPeer.GetComponent<MissionPeer>().DisplayedName + ": " + message.Message, Color.ConvertStringToColor("#FFEA33FF").ToUnsignedInteger());
                 return false;
             }
-            if (persistentEmpireRepresentative.IsAdmin || this.patreonRegistry.IsPlayerPatreon(networkPeer)) return true;
-            if (this.DisableGlobalChat) return false;
-            if (this.Muted.ContainsKey(networkPeer))
+            else if (this.Muted.ContainsKey(networkPeer))
             {
                 InformationComponent.Instance.SendMessage("You are muted.", Colors.Red.ToUnsignedInteger(), networkPeer);
                 return false;
             }
-            InformationComponent.Instance.BroadcastMessage($"{networkPeer.GetComponent<MissionPeer>().DisplayedName}: {message.Message}", Color.ConvertStringToColor("#FDD835FF").ToUnsignedInteger());
+            else if (!this.DisableGlobalChat)
+            {
+                InformationComponent.Instance.BroadcastMessage($"{networkPeer.GetComponent<MissionPeer>().DisplayedName}: {message.Message}", Color.ConvertStringToColor("#FFFFFFFF").ToUnsignedInteger());
+            }
+            if (persistentEmpireRepresentative.IsAdmin || this.patreonRegistry.IsPlayerPatreon(networkPeer)) return true;
             return true;
         }
 

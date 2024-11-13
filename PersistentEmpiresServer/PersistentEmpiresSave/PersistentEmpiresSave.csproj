@@ -227,6 +227,7 @@
     <Compile Include="Database\Repositories\DBMoneyChestRepository.cs" />
     <Compile Include="Database\Repositories\DBPlayerNameRepository.cs" />
     <Compile Include="Database\Repositories\DBPlayerRepository.cs" />
+    <Compile Include="Database\Repositories\DBSkillLockRepository.cs" />
     <Compile Include="Database\Repositories\DBStockpileMarketRepository.cs" />
     <Compile Include="Database\Repositories\DBUpgradeableBuildingRepository.cs" />
     <Compile Include="Database\Repositories\DBWhitelistRepository.cs" />

@@ -68,6 +68,9 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         public delegate DBPlayer GetOrCreatePlayer(NetworkCommunicator peer, out bool created);
         public delegate DBPlayer GetPlayer(string playerId);
         public delegate bool UpdateCustomName(NetworkCommunicator peer, string customName);
+        /* Skill Locks */
+        public delegate DBSkillLocks CreateOrSaveSkillLock(NetworkCommunicator peer);
+        public delegate DBSkillLocks CreateOrGetSkillLock(NetworkCommunicator peer);
         /* Inventories */
         public delegate IEnumerable<DBInventory> GetAllInventories();
         public delegate IEnumerable<DBInventory> GetAllEnderInventories();
@@ -134,6 +137,9 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         public static event GetOrCreatePlayer OnGetOrCreatePlayer;
         public static event GetPlayer OnGetPlayer;
         public static event UpdateCustomName OnPlayerUpdateCustomName;
+        /* Skill Locks */
+        public static event CreateOrSaveSkillLock OnCreateOrSaveSkillLock;
+        public static event CreateOrGetSkillLock OnCreateOrGetSkillLock;
         /* Inventories */
         public static event GetOrCreatePlayerInventory OnGetOrCreatePlayerInventory;
         public static event CreateOrSavePlayerInventory OnCreateOrSavePlayerInventory;
@@ -415,6 +421,35 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             }
             return null;
         }
+
+
+        public static DBSkillLocks HandleCreateOrSaveSkillLock(NetworkCommunicator peer)
+        {
+            Debug.Print("[Save System] Is OnCreateOrSavePlayer null ? " + (OnCreateOrSaveSkillLock == null).ToString());
+            long rightNow = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            if (OnCreateOrSaveSkillLock != null)
+            {
+                var result = OnCreateOrSaveSkillLock(peer);
+                LogQuery(String.Format("[SaveSystem] OnCreateOrSavePlayer Took {0} ms", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - rightNow));
+                return result;
+            }
+            return null;
+        }
+
+        public static DBSkillLocks HandleCreateOrGetSkillLock(NetworkCommunicator peer)
+        {
+            Debug.Print("[Save System] Is OnGetOrCreatePlayerLock null ? " + (OnCreateOrGetSkillLock == null).ToString());
+            long rightNow = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            if (OnCreateOrGetSkillLock != null)
+            {
+                var result = OnCreateOrGetSkillLock(peer);
+                LogQuery(String.Format("[SaveSystem] OnGetOrCreatePlayer Took {0} ms", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - rightNow));
+                return result;
+            }
+            return null;
+        }
+
+
         public static IEnumerable<DBInventory> HandleGetAllInventories()
         {
             Debug.Print("[Save System] Is OnGetAllInventories null ? " + (OnGetAllInventories == null).ToString());

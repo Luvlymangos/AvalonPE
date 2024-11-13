@@ -417,7 +417,11 @@ namespace PersistentEmpires.Views.Views
 			{
 				return true;
 			}
-			return false;
+			else if (agent.IsActive() && agent.SpawnEquipment[EquipmentIndex.Body].IsEmpty != true && agent.SpawnEquipment[EquipmentIndex.Body].Item.StringId == "pe_invis")
+			{
+				return true;
+			}
+                return false;
 		}
 
 		// Token: 0x060002FB RID: 763 RVA: 0x0001A4D8 File Offset: 0x000186D8

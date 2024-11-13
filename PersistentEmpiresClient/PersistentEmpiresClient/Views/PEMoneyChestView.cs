@@ -44,7 +44,7 @@ namespace PersistentEmpires.Views.Views
 
         private void Mcb_OnUpdateGoldMC(PE_MoneyChest mc, int newAmount)
         {
-            if(this.ActiveEntity == mc)
+            if (this.ActiveEntity == mc)
             {
                 this._dataSource.Balance = newAmount;
             }
@@ -172,10 +172,6 @@ namespace PersistentEmpires.Views.Views
                 base.MissionScreen.AddLayer(this._gauntletLayer);
                 ScreenManager.TrySetFocus(this._gauntletLayer);
                 this.IsActive = true;
-            }
-            if (this.ActiveEntity.CanUserUse(GameNetwork.MyPeer) == false)
-            {
-                this.CloseImportExport();
             }
         }
     }

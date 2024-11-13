@@ -126,12 +126,14 @@ namespace PersistentEmpiresLib.SceneScripts
         protected override bool OnHit(Agent attackerAgent, int damage, Vec3 impactPosition, Vec3 impactDirection, in MissionWeapon weapon, ScriptComponentBehavior attackerScriptComponentBehavior, out bool reportDamage)
         {
             reportDamage = true;
+#if SERVER
             OfflineProtectionBehaviour offlineProtectionBehaviour = Mission.Current.GetMissionBehavior<OfflineProtectionBehaviour>();
             if ((!ladderBuilt && offlineProtectionBehaviour.IsOfflineProtectionActive))
             {
                 InformationComponent.Instance.SendMessage("Offline protection is active", 0x02ab89d9, attackerAgent.MissionPeer.GetNetworkPeer());
                 return false;
             }
+#endif
             MissionWeapon missionWeapon = weapon;
             WeaponComponentData currentUsageItem = missionWeapon.CurrentUsageItem;
             if (

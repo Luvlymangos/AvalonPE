@@ -29,6 +29,7 @@ namespace PersistentEmpiresLib.SceneScripts
         public int Constant;
         public int Stability;
         public int Tier;
+        public int MaxStock = 500;
         // X is stock Y is price x^(1/stability) * y = k
         public MarketItem(string itemId, int maximumPrice, int minimumPrice, int stability, int tier)
         {
@@ -42,7 +43,7 @@ namespace PersistentEmpiresLib.SceneScripts
         }
         public void UpdateReserve(int newStock)
         {
-            if (newStock > 500) newStock = 500;
+            if (newStock > MaxStock) newStock = MaxStock;
             if (newStock < 0) newStock = 0;
             this.Stock = newStock;
         }
@@ -50,7 +51,7 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             if (MinimumPrice <= 20) return MaximumPrice;
             int price = (int)CurrentPrice;
-            if (Stock > 500)
+            if (Stock > MaxStock)
             {
                 price = MinimumPrice;
             }
@@ -61,7 +62,7 @@ namespace PersistentEmpiresLib.SceneScripts
             else
             {
                 int priceRange = MaximumPrice - MinimumPrice;
-                int stockRange = 500;
+                int stockRange = MaxStock;
                 int stockFactor = Stock;
                 price = MinimumPrice + (priceRange * (stockRange - stockFactor) / stockRange);
             }
@@ -84,7 +85,7 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             int price = (int)CurrentPrice;
             if (MinimumPrice <= 20) return MinimumPrice;
-            if (Stock > 500)
+            if (Stock > MaxStock)
             {
                 price = MinimumPrice;
             }
@@ -95,7 +96,7 @@ namespace PersistentEmpiresLib.SceneScripts
             else
             {
                 int priceRange = MaximumPrice - MinimumPrice;
-                int stockRange = 500;
+                int stockRange = MaxStock;
                 int stockFactor = Stock;
                 price = MinimumPrice + (priceRange * (stockRange - stockFactor) / stockRange);
             }
@@ -129,8 +130,7 @@ namespace PersistentEmpiresLib.SceneScripts
     }
     public class PE_StockpileMarket : PE_UsableFromDistance, IMissionObjectHash
     {
-
-        public static int MAX_STOCK_COUNT = 1000;
+        public static int MAX_STOCK_COUNT = 1000; 
         public string XmlFile = "examplemarket"; // itemId*minimum*maximum,itemId*minimum*maximum
         public string ModuleFolder = "PersistentEmpires";
         protected override bool LockUserFrames
@@ -278,7 +278,14 @@ namespace PersistentEmpiresLib.SceneScripts
                     Debug.Print(" ERROR IN MARKET SERIALIZATION " + this.XmlFile + " ITEM ID " + s.Split('*')[0] + " NOT FOUND !!! ", 0, Debug.DebugColor.Red);
                 }
                 int stock = int.Parse(s.Split('*')[1]);
-                MarketItems.Find(m => m.Item.StringId == item.StringId).UpdateReserve(stock);
+                try 
+                {
+                    MarketItems.Find(m => m.Item.StringId == item.StringId).UpdateReserve(stock);
+                }
+                catch(Exception e)
+                {
+                    Debug.Print(" ERROR IN MARKET SERIALIZATION " + this.XmlFile + " ITEM ID " + s.Split('*')[0] + " NOT FOUND !!! ", 0, Debug.DebugColor.Red);
+                }
             }
         }
         public string SerializeStocks()
@@ -302,7 +309,7 @@ namespace PersistentEmpiresLib.SceneScripts
                 foreach (MarketItem marketItem in this.MarketItems)
                 {
                     var currentStock = marketItem.Stock;
-                    if (currentStock + 10 < 900)
+                    if (currentStock + 10 < 500)
                     {
                         marketItem.UpdateReserve(currentStock + 10);
                     }

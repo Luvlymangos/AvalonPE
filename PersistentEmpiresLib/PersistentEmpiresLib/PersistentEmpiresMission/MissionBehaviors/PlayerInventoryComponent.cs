@@ -480,7 +480,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 droppedItem,
                 droppedCount
             });
-
+            SaveSystemBehavior.HandleCreateOrSavePlayerInventory(player);
             return true;
         }
 
@@ -628,6 +628,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 GameNetwork.BeginModuleEventAsServer(player);
                 GameNetwork.WriteMessage(new UpdateInventorySlot("PlayerInventory_" + slot, sourceInventory.Slots[slot].Item, sourceInventory.Slots[slot].Count));
                 GameNetwork.EndModuleEventAsServer();
+                SaveSystemBehavior.HandleCreateOrSavePlayerInventory(player);
                 return true;
             }
             else if (this.CustomInventories.ContainsKey(inventory))
@@ -676,8 +677,10 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                     GameNetwork.WriteMessage(new UpdateInventorySlot(sourceInventory.InventoryId + "_" + slot, sourceInventory.Slots[slot].Item, sourceInventory.Slots[slot].Count));
                     GameNetwork.EndModuleEventAsServer();
                 }
+                SaveSystemBehavior.HandleCreateOrSavePlayerInventory(player);
                 return true;
             }
+            SaveSystemBehavior.HandleCreateOrSavePlayerInventory(player);
             return true;
         }
         private bool HandleRequestInventoryHotkey(NetworkCommunicator player, InventoryHotkey message)
@@ -739,6 +742,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                         if (itemCount == 0) break;
                     }
                 }
+                SaveSystemBehavior.HandleCreateOrSavePlayerInventory(player);
                 return true;
             }
             else if (this.CustomInventories.ContainsKey(inventory))
@@ -1069,6 +1073,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         private bool HandleRequestInventoryTransferFromClient(NetworkCommunicator player, RequestInventoryTransfer message)
         {
             return this.TransferInventoryItem(player, message.DroppedTag, message.DraggedTag);
+            
         }
 
 

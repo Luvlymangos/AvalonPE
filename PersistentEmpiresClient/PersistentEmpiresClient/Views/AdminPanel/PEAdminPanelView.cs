@@ -78,6 +78,12 @@ namespace PersistentEmpires.Views.Views
                 this.CloseAdminPanel();
                 base.Mission.GetMissionBehavior<PEAdminFactionView>().OnOpen();
             }));
+            
+            menuItemVm.Add(new PEAdminMenuItemVM(new TextObject("Skill Management"), () =>
+            {
+                this.CloseAdminPanel();
+                base.Mission.GetMissionBehavior<PEAdminSkillView>().OnOpen();
+            }));
 
             menuItemVm.Add(new PEAdminMenuItemVM(new TextObject("Give Yourself Money"), () =>
             {
@@ -91,18 +97,6 @@ namespace PersistentEmpires.Views.Views
                 GameNetwork.BeginModuleEventAsClient();
                 GameNetwork.WriteMessage(new RequestBecameGodlike());
                 GameNetwork.EndModuleEventAsClient();
-            }));
-
-            menuItemVm.Add(new PEAdminMenuItemVM(new TextObject("Remove Unused Boats"), () =>
-            {
-                this.CloseAdminPanel();
-                InformationManager.DisplayMessage(new InformationMessage("Not implemented yet"));
-            }));
-
-            menuItemVm.Add(new PEAdminMenuItemVM(new TextObject("Remove Unused Attachable"), () =>
-            {
-                this.CloseAdminPanel();
-                InformationManager.DisplayMessage(new InformationMessage("Not implemented yet"));
             }));
 
             return menuItemVm;

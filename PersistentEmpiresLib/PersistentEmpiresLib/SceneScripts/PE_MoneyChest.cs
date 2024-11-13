@@ -113,9 +113,9 @@ namespace PersistentEmpiresLib.SceneScripts
             if (this.GetFaction() == null) return false;
             if (this.IsBroken()) return true;
             if (this.GetFaction().lordId != player.VirtualPlayer.Id.ToString()) return false;
-            House house = Mission.Current.GetMissionBehavior<HouseBehviour>().Houses[this.HouseIndex];
-            if (this.PlayerHouse && house.lordId == player.VirtualPlayer.Id.ToString()) return true;
-            if (this.PlayerHouse && !house.marshalls.Contains(player.VirtualPlayer.Id.ToString())) return false;
+            //House house = Mission.Current.GetMissionBehavior<HouseBehviour>().Houses[this.HouseIndex];
+            //if (this.PlayerHouse && house.lordId == player.VirtualPlayer.Id.ToString()) return true;
+            //if (this.PlayerHouse && !house.marshalls.Contains(player.VirtualPlayer.Id.ToString())) return false;
             return true;
         }
 

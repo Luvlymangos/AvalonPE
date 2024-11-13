@@ -14,6 +14,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.MountAndBlade.Network.Messages;
 using static TaleWorlds.MountAndBlade.GameNetwork;
 
 namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
@@ -85,6 +86,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 registerer.Register<AgentLabelConfig>(this.HandleServerAgentLabelConfig);
                 registerer.Register<ExistingObjectsEnd>(this.HandleFromServerExistingObjectsEnd);
                 registerer.Register<SyncCraftingStats>(this.HandleServerCraftingStats);
+                registerer.Register<SyncSkillLocks>(this.HandleSkillLocks);
             }
             else
             {
@@ -94,6 +96,21 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             }
         }
 
+
+        private void HandleSkillLocks(SyncSkillLocks message)
+        {
+            if (this._myRepresentative != null)
+            {
+                try
+                {
+                    this._myRepresentative.LockedSkills.Add(message.Skill, message.Locked);
+                }
+                catch (Exception e)
+                {
+                    this._myRepresentative.LockedSkills[message.Skill] = message.Locked;
+                }
+            }
+        }
 
         private void HandleFromServerExistingObjectsEnd(ExistingObjectsEnd message)
         {
@@ -111,6 +128,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         {
             if (this._myRepresentative != null)
             {
+
                 KeyValuePair<string, int> skill = this._myRepresentative.GetSkill(message.Skill);
                 if (skill.Key != null)
                 {
