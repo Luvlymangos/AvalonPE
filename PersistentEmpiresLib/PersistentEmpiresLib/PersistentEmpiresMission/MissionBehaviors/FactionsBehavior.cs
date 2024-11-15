@@ -189,6 +189,18 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
         }
 
+        public int GetIndexByValue(Faction faction)
+        {
+            foreach (KeyValuePair<int, Faction> entry in this.Factions)
+            {
+                if (entry.Value == faction)
+                {
+                    return entry.Key;
+                }
+            }
+            return -1;
+        }
+
         public void AddFaction(int factionIndex, Faction f)
         {
             this.Factions[factionIndex] = f;

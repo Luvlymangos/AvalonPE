@@ -31,6 +31,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         {
 
             if (!affectedAgent.IsHuman) return;
+            if (affectedAgent.IsAIControlled) return;
             if (blow.InflictedDamage == 0) return;
             if (!affectorAgent.IsHuman) return;
             if (affectorAgent.MountAgent != null) return;

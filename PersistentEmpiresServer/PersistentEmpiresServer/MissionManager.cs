@@ -1,4 +1,5 @@
 ﻿using PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors;
+using PersistentEmpiresMission.MissionBehaviors;
 using PersistentEmpiresServer.ServerMissions;
 using PersistentEmpiresServer.SpawnBehavior;
 using System;
@@ -81,7 +82,8 @@ namespace PersistentEmpiresServer
                         new PlantingBehaviour(),
                         // new WhitelistBehavior(),
                         new AgentCapture(),
-                        new WeaponDamageOffset()
+                        new WeaponDamageOffset(),
+                        new GateGuardBehaviour()
 						// new AgentHumanAILogic()
 						// new EquipmentControllerLeaveLogic(),
 						// new MultiplayerPreloadHelper()
