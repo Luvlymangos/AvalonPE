@@ -151,11 +151,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AgentBehaviours\GreetingsBehaviour.cs" />
     <Compile Include="Database\DBEntities\DBCart.cs" />
     <Compile Include="Database\DBEntities\DBHouses.cs" />
     <Compile Include="Database\DBEntities\DBMoneyChest.cs" />
     <Compile Include="Database\DBEntities\DBSkillLocks.cs" />
     <Compile Include="Database\DBEntities\DBWorkshops.cs" />
+    <Compile Include="Data\GuardType.cs" />
     <Compile Include="Data\House.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ConfigManage.cs" />
@@ -348,6 +350,8 @@
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\AnimationBehavior.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\AutorestartBehavior.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\BankingComponent.cs" />
+    <Compile Include="PersistentEmpiresMission\MissionBehaviors\BotAgent.cs" />
+    <Compile Include="PersistentEmpiresMission\MissionBehaviors\BotConfig.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\CastlesBehavior.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\CombatlogBehavior.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\CraftingComponent.cs" />
@@ -359,6 +363,7 @@
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\FactionPollComponent.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\FactionsBehavior.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\FactionUIComponent.cs" />
+    <Compile Include="PersistentEmpiresMission\MissionBehaviors\GateGuardBehaviour.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\HouseBehaviour.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\ImportExportComponent.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\InformationComponent.cs" />
@@ -372,6 +377,7 @@
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\PersistentEmpireBehavior.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\PersistentEmpireClientBehavior.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\PersistentEmpireSceneSyncBehaviors.cs" />
+    <Compile Include="PersistentEmpiresMission\MissionBehaviors\PE_SpawnBot.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\PickpocketingBehavior.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\PlantingBehaviour.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\PlayerInventoryComponent.cs" />
@@ -425,6 +431,7 @@
     <Compile Include="SceneScripts\PE_DayNightCycle.cs" />
     <Compile Include="SceneScripts\PE_DestructableComponent.cs" />
     <Compile Include="SceneScripts\PE_factionDoor.cs" />
+    <Compile Include="SceneScripts\PE_GuardPost.cs" />
     <Compile Include="SceneScripts\PE_ItemConverter.cs" />
     <Compile Include="SceneScripts\PE_LadderBuilder.cs" />
     <Compile Include="SceneScripts\PE_Mangonel.cs" />

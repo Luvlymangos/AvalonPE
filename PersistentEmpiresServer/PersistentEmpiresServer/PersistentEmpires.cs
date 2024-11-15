@@ -48,17 +48,12 @@ namespace PersistentEmpiresServer
             Debug.Print("** Persistent Empires, Multiplayer Game Start Loading...");
 
             PersistentEmpiresGameMode.OnStartMultiplayerGame += MissionManager.OpenPersistentEmpires;
-            Debug.Print("1");
             PatchGlobalChat.OnClientEventPlayerMessageTeam += FactionsBehavior.PatchGlobalChat_OnClientEventPlayerMessageTeam;
-            Debug.Print("2");
+            PersistentEmpiresHarmonySubModule.OnRglExceptionThrown += SaveSystemBehavior.RglExceptionThrown;
             PatchGameNetwork.OnAddNewPlayerOnServer += SaveSystemBehavior.OnAddNewPlayerOnServer;
-            Debug.Print("3");
             AdminServerBehavior.OnIsPlayerBanned += DBBanRecordRepository.IsPlayerBanned;
-            Debug.Print("4");
             AdminServerBehavior.OnBanPlayer += DBBanRecordRepository.AdminServerBehavior_OnBanPlayer;
-            Debug.Print("5");
             TaleWorlds.MountAndBlade.Module.CurrentModule.AddMultiplayerGameMode(new PersistentEmpiresGameMode("PersistentEmpires"));
-            Debug.Print("6");
         }
     }
 }
