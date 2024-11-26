@@ -18,9 +18,10 @@
     <Optimize>false</Optimize>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <DefineConstants>TRACE;DEBUG;CLIENT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CLIENT;_RGL_KEEP_ASSERTS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>E:\SteamLibrary\steamapps\workshop\content\261550\3359655368\bin\Win64_Shipping_Client\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DefineConstants />
@@ -37,7 +38,7 @@
     <Optimize>true</Optimize>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <DefineConstants>TRACE;DEBUG;CLIENT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CLIENT;_RGL_KEEP_ASSERTS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <OutputPath>E:\SteamLibrary\steamapps\workshop\content\261550\3359655368\bin\Win64_Shipping_Client\</OutputPath>
@@ -269,6 +270,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SentryForView.cs" />
     <Compile Include="ViewHandler.cs" />
+    <Compile Include="ViewsVM\AdminPanel\Buttons\Debug.cs" />
     <Compile Include="ViewsVM\AdminPanel\Buttons\SkillSet.cs" />
     <Compile Include="ViewsVM\AdminPanel\Buttons\UnWound.cs" />
     <Compile Include="ViewsVM\AdminPanel\Buttons\PEAdminButtonVM.cs" />

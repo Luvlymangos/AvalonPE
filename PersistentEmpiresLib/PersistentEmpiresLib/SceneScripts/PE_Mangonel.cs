@@ -902,6 +902,7 @@ namespace PersistentEmpiresLib.SceneScripts
             this.SetHitPoint(this.HitPoint - damage, impactDirection);
             if (GameNetwork.IsServer)
             {
+                if (attackerAgent.MissionPeer.GetNetworkPeer() == null) return false;
                 LoggerHelper.LogAnAction(attackerAgent.MissionPeer.GetNetworkPeer(), LogAction.PlayerHitToDestructable, null, new object[] { this.GetType().Name });
             }
 

@@ -69,6 +69,10 @@ namespace PersistentEmpiresLib.SceneScripts
             if (this.CastleId == -1) return true;
             Faction f = this.GetCastleBanner().GetOwnerFaction();
             NetworkCommunicator player = userAgent.MissionPeer.GetNetworkPeer();
+            if (player == null)
+            {
+                return false;
+            }
             PersistentEmpireRepresentative persistentEmpireRepresentative =  player.GetComponent<PersistentEmpireRepresentative>();
             if (this.AllowMembersWithoutKeys && persistentEmpireRepresentative.GetFaction() == f) return true;
             if (f.doorManagers.Contains(player.VirtualPlayer.Id.ToString()) || f.marshalls.Contains(player.VirtualPlayer.Id.ToString()) || f.lordId == player.VirtualPlayer.Id.ToString()) return true;
@@ -77,7 +81,11 @@ namespace PersistentEmpiresLib.SceneScripts
         public override void OnUse(Agent userAgent)
         {
             Debug.Print("[USING LOG] AGENT USE " + this.GetType().Name);
-
+            if (userAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return;
+            }
             if (!base.IsUsable(userAgent))
             {
                 userAgent.StopUsingGameObjectMT(false);
@@ -92,6 +100,10 @@ namespace PersistentEmpiresLib.SceneScripts
                 {
                     bool canPlayerUse = this.CanPlayerUse(userAgent);
                     NetworkCommunicator player = userAgent.MissionPeer.GetNetworkPeer();
+                    if (player == null)
+                    {
+                        return;
+                    }
                     if (this.CastleId > -1)
                     {
                         PE_RepairableDestructableComponent destructComponent = base.GameEntity.GetFirstScriptOfType<PE_RepairableDestructableComponent>();

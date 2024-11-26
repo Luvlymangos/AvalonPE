@@ -25,38 +25,48 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             if (!affectorAgent.IsHuman) return;
             if (affectorAgent == null) return;
             if (affectorWeapon.Item == null) return;
-
             if (affectorWeapon.Item.StringId.StartsWith("Uncommon_"))
             {
-                AddNewDamage(blow.InflictedDamage, .1, affectedAgent, affectorAgent);
+                AddNewDamage(blow.InflictedDamage, .1, affectedAgent, affectorAgent, affectorWeapon);
             }
             if (affectorWeapon.Item.StringId.StartsWith("Rare_"))
             {
-                AddNewDamage(blow.InflictedDamage, .2, affectedAgent, affectorAgent);
+                AddNewDamage(blow.InflictedDamage, .2, affectedAgent, affectorAgent, affectorWeapon);
             }
             if (affectorWeapon.Item.StringId.StartsWith("Epic_"))
             {
-                AddNewDamage(blow.InflictedDamage, .3, affectedAgent, affectorAgent);
+                AddNewDamage(blow.InflictedDamage, .3, affectedAgent, affectorAgent, affectorWeapon);
             }
             if (affectorWeapon.Item.StringId.StartsWith("Legendary_"))
             {
-                AddNewDamage(blow.InflictedDamage, .4, affectedAgent, affectorAgent);
+                AddNewDamage(blow.InflictedDamage, .4, affectedAgent, affectorAgent, affectorWeapon);
             }
             if (affectorWeapon.Item.StringId.StartsWith("Mythic_"))
             {
-                AddNewDamage(blow.InflictedDamage, .5, affectedAgent, affectorAgent);
-            }
-            if (affectorWeapon.Item.Type == ItemObject.ItemTypeEnum.Crossbow)
-            {
-                AddNewDamage(blow.InflictedDamage, .2, affectedAgent, affectorAgent);
+                AddNewDamage(blow.InflictedDamage, .5, affectedAgent, affectorAgent, affectorWeapon);
             }
         }
-        public void AddNewDamage(int BaseDamage, double multiplier, Agent affectedAgent, Agent affectorAgent)
+        public void AddNewDamage(int BaseDamage, double multiplier, Agent affectedAgent, Agent affectorAgent, MissionWeapon weapon)
         {
             try
             {
+                if (affectedAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
+                if (affectorAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 NetworkCommunicator peer = affectedAgent.MissionPeer.GetNetworkPeer();
                 NetworkCommunicator peer2 = affectorAgent.MissionPeer.GetNetworkPeer();
+                if (peer == null || peer2 == null)
+                {
+                    Debug.Print("Representitive Is null");
+                    return;
+                }
                 Blow blow2 = new Blow(affectedAgent.Index);
                 blow2.DamageType = TaleWorlds.Core.DamageTypes.Pierce;
                 blow2.BoneIndex = affectedAgent.Monster.HeadLookDirectionBoneIndex;
@@ -64,7 +74,19 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 blow2.GlobalPosition.z = blow2.GlobalPosition.z + affectedAgent.GetEyeGlobalHeight();
                 blow2.BaseMagnitude = 40;
                 blow2.WeaponRecord.FillAsMeleeBlow(null, null, -1, -1);
-                blow2.InflictedDamage = (int)(BaseDamage * multiplier);
+                if (weapon.Item.ItemType == ItemObject.ItemTypeEnum.Arrows)
+                {
+                    blow2.InflictedDamage = (int)(BaseDamage * (multiplier/2));
+                }
+                if (weapon.Item.ItemType == ItemObject.ItemTypeEnum.Bolts)
+                {
+                    blow2.InflictedDamage = (int)(BaseDamage * .2);
+                }
+                else 
+                {
+                    blow2.InflictedDamage = (int)(BaseDamage * multiplier);
+                }
+                
                 blow2.SwingDirection = affectedAgent.LookDirection;
                 MatrixFrame frame = affectedAgent.Frame;
                 blow2.SwingDirection = frame.rotation.TransformToParent(new Vec3(-1f, 0f, 0f, -1f));

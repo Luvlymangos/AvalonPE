@@ -284,10 +284,20 @@ namespace PersistentEmpiresLib.SceneScripts
         protected override bool OnHit(Agent attackerAgent, int damage, Vec3 impactPosition, Vec3 impactDirection, in MissionWeapon weapon, ScriptComponentBehavior attackerScriptComponentBehavior, out bool reportDamage)
         {
             reportDamage = false;
+            if (attackerAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return false;
+            }
             MissionWeapon missionWeapon = weapon;
             WeaponComponentData currentUsageItem = missionWeapon.CurrentUsageItem;
             if (attackerAgent == null) return false;
+            if (attackerAgent.IsAIControlled) return false;
             NetworkCommunicator player = attackerAgent.MissionPeer.GetNetworkPeer();
+            if (player == null)
+            {
+                return false;
+            }
             PersistentEmpireRepresentative perp = player.GetComponent<PersistentEmpireRepresentative>();
             bool isAdmin = Main.IsPlayerAdmin(player);
             if(isAdmin && missionWeapon.Item != null && missionWeapon.Item.StringId == "pe_adminhammer" && Main.IsPlayerAdmin(player))

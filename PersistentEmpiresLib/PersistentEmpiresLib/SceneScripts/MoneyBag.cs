@@ -192,6 +192,15 @@ namespace PersistentEmpiresLib.SceneScripts
             {
                 if(GameNetwork.IsServer)
                 {
+                    if (userAgent.MissionPeer == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        return;
+                    }
+                    if (userAgent.MissionPeer.GetNetworkPeer() == null)
+                    {
+                        return;
+                    }
                     PersistentEmpireRepresentative representative = userAgent.MissionPeer.GetNetworkPeer().GetComponent<PersistentEmpireRepresentative>();
                     representative.GoldGain(this._amount);
                     LoggerHelper.LogAnAction(userAgent.MissionPeer.GetNetworkPeer(), LogAction.PlayerPickedUpGold, null, new object[] { this._amount });

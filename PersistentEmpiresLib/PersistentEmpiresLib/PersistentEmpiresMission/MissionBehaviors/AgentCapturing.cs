@@ -40,7 +40,13 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             if (affectorWeapon.Item == null) return;
             if (affectorWeapon.Item.StringId != this.ItemId) return;
             if (blow.AttackType != AgentAttackType.Standard) return;
+            if (affectedAgent.MissionPeer == null) return;
             NetworkCommunicator peer = affectedAgent.MissionPeer.GetNetworkPeer();
+            if (peer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return;
+            }
             if (affectedAgent.Health > affectedAgent.HealthLimit * 0.8) return;
             if (peer == null) return;
             foreach (var Value in CapturedDict)

@@ -128,6 +128,11 @@ namespace PersistentEmpiresLib.SceneScripts
             base.OnUseStopped(userAgent, isSuccessful, preferenceIndex);
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 Debug.Print("USINGLOG "+isSuccessful.ToString());
                 Debug.Print("[USING LOG] AGENT USE STOPPED " + this.GetType().Name);
                 if (isSuccessful)
@@ -137,6 +142,11 @@ namespace PersistentEmpiresLib.SceneScripts
                     if (userAgent.Equipment[wieldedEquipmentIndex].Item.StringId != this.CaptureItem) return;
 
                     NetworkCommunicator peer = userAgent.MissionPeer.GetNetworkPeer();
+                    if (peer == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        return;
+                    }
                     PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
                     Faction capturerFaction = persistentEmpireRepresentative.GetFaction();
                     if (persistentEmpireRepresentative.GetFactionIndex() == 0 || persistentEmpireRepresentative.GetFactionIndex() == 1) return;
@@ -164,6 +174,11 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 Debug.Print("[USING LOG] AGENT USING " + this.GetType().Name);
                 if (base.HasUser)
                 {
@@ -178,6 +193,11 @@ namespace PersistentEmpiresLib.SceneScripts
                 }
 
                 NetworkCommunicator peer = userAgent.MissionPeer.GetNetworkPeer();
+                if (peer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
                 Faction capturerFaction = persistentEmpireRepresentative.GetFaction();
                 int capturerFactionIndex = persistentEmpireRepresentative.GetFactionIndex();

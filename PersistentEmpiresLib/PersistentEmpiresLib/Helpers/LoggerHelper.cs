@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.Library;
 
 namespace PersistentEmpiresLib.Helpers
 {
@@ -87,7 +88,17 @@ namespace PersistentEmpiresLib.Helpers
 
         private static string FormatLogForAgent(Agent agent, DateTime dateTime)
         {
-            if(agent.IsHuman && agent.IsPlayerControlled)
+            if (agent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return null;
+            }
+            if (agent.MissionPeer.GetNetworkPeer() == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return null;
+            }
+            if (agent.IsHuman && agent.IsPlayerControlled)
             {
                 return FormatLogForPlayer(agent.MissionPeer.GetNetworkPeer(), dateTime, false);
             }else if(agent.IsMount && agent.RiderAgent != null && agent.RiderAgent.IsHuman && agent.RiderAgent.IsPlayerControlled)
@@ -114,6 +125,17 @@ namespace PersistentEmpiresLib.Helpers
 
         public static NetworkCommunicator GetAffectedPeerFromAgent(Agent affectedAgent)
         {
+            if (affectedAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return null;
+            }
+
+            if (affectedAgent.MissionPeer.GetNetworkPeer() == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return null;
+            }
             if (affectedAgent.MissionPeer != null && affectedAgent.MissionPeer.GetNetworkPeer().GetComponent<PersistentEmpireRepresentative>() != null)
             {
                 return affectedAgent.MissionPeer.GetNetworkPeer();

@@ -21,6 +21,7 @@ namespace PersistentEmpiresLib
 {
     public class PersistentEmpireRepresentative : MissionRepresentativeBase
     {
+        public bool DebugMode = false;
         private House _house;
         private Faction _playerFaction;
         private int _factionIndex = -1;
@@ -38,7 +39,7 @@ namespace PersistentEmpiresLib
         public Vec3 LoadedDbPosition;
         public Equipment LoadedSpawnEquipment;
         public bool IsLordClass = false;
-        public int SkillCap = 1000;
+        public int SkillCap = 1200;
         public Dictionary<string, int> LoadedSkills = new Dictionary<string, int>();
         public Dictionary<string,bool> LockedSkills = new Dictionary<string, bool>();
 
@@ -66,7 +67,7 @@ namespace PersistentEmpiresLib
 
         float GetDiminishingFactor(int skillLevel)
         {
-            float maxSkill = 1000.0f; // Maximum skill level
+            float maxSkill = (float)SkillCap; // Maximum skill level
             float minFactor = 0.20f;  // Minimum factor (1% of skill gained)
 
             // Calculate the diminishing factor with a minimum threshold
@@ -119,7 +120,7 @@ namespace PersistentEmpiresLib
             KeyValuePair<string, int> skill = GetSkill(skillName);
             float diminishingFactor = GetDiminishingFactor(skill.Value);
             int GainAmount = (int)(amount * diminishingFactor);
-
+            if (GainAmount <= 0) GainAmount = 1;
             int totalSkills = 0;
 
             foreach (int skillValue in LoadedSkills.Values)

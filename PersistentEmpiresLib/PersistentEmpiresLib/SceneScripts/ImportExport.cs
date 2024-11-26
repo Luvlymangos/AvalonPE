@@ -81,6 +81,8 @@ namespace PersistentEmpiresLib.SceneScripts
             base.OnUse(userAgent);
             if(GameNetwork.IsServer)
             {
+
+                if (userAgent.MissionPeer == null) return;
                 this.importExportComponent.OpenImportExportForPeer(userAgent.MissionPeer.GetNetworkPeer(), this);
                 userAgent.StopUsingGameObjectMT(true);
             }

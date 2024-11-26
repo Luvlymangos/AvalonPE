@@ -102,7 +102,13 @@ namespace PersistentEmpiresLib.SceneScripts
             {
                 if (GameNetwork.IsServer)
                 {
+                    if (userAgent.MissionPeer == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        return;
+                    }
                     NetworkCommunicator peer = userAgent.MissionPeer.GetNetworkPeer();
+                    if (peer == null) return;
                     PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
                     if (this.ForMount == false)
                     {
@@ -129,12 +135,18 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 if (base.HasUser)
                 {
                     userAgent.StopUsingGameObjectMT(false);
                     return;
                 }
                 NetworkCommunicator peer = userAgent.MissionPeer.GetNetworkPeer();
+                if (peer == null) return;
                 PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
                 if (this.HouseBed)
                 {

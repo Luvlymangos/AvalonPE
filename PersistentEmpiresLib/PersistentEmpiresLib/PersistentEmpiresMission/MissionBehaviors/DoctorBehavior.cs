@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ObjectSystem;
 
@@ -39,9 +40,13 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 return;
             }
             NetworkCommunicator peer = affectedAgent.MissionPeer.GetNetworkPeer();
-            if (peer == null) return;
+            if (peer == null || !peer.IsConnectionActive)
+            {
+                Debug.Print("Agent's mission peer is null or disconnected");
+                return;
+            }
 
-            if(CombatlogBehavior.Instance != null && CombatlogBehavior.Instance.IsPlayerInCombatState(peer))
+            if (CombatlogBehavior.Instance != null && CombatlogBehavior.Instance.IsPlayerInCombatState(peer))
             {
                 return;
             }

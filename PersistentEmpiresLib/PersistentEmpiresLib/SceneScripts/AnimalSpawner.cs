@@ -129,7 +129,17 @@ namespace PersistentEmpiresLib.SceneScripts
             {
                 if (GameNetwork.IsServer)
                 {
+                    if (userAgent.MissionPeer == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        return;
+                    }
                     NetworkCommunicator peer = userAgent.MissionPeer.GetNetworkPeer();
+                    if (peer == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        return;
+                    }
                     PersistentEmpireRepresentative persistentEmpireRepresentative =  peer.GetComponent<PersistentEmpireRepresentative>();
                     Inventory playerInventory = persistentEmpireRepresentative.GetInventory();
                     bool inventoryContainsEveryItem = this.NeededReceipt.All((r) => playerInventory.IsInventoryIncludes(r.Item, r.NeededCount));
@@ -169,8 +179,18 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 Debug.Print("[USING LOG] AGENT USING " + this.GetType().Name);
                 NetworkCommunicator peer = userAgent.MissionPeer.GetNetworkPeer();
+                if (peer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 if (this.SpawnedAnimals.Count >= this.MaxAgentCount)
                 {
                     InformationComponent.Instance.SendMessage("Spawner maxed out", new Color(1f, 0, 0).ToUnsignedInteger(), peer);

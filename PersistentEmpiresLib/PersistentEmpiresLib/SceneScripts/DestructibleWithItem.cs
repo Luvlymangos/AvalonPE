@@ -176,6 +176,11 @@ namespace PersistentEmpiresLib.SceneScripts
         protected override bool OnHit(Agent attackerAgent, int damage, Vec3 impactPosition, Vec3 impactDirection, in MissionWeapon weapon, ScriptComponentBehavior attackerScriptComponentBehavior, out bool reportDamage)
         {
             reportDamage = true;
+            if (attackerAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return false;
+            }
             MissionWeapon missionWeapon = weapon;
             WeaponComponentData currentUsageItem = missionWeapon.CurrentUsageItem;
             if (weapon.Item == null || weapon.Item.StringId != this.RequiredItemId || this.destructed)
@@ -202,6 +207,11 @@ namespace PersistentEmpiresLib.SceneScripts
                 if (dropItem.DropChance >= MBRandom.RandomInt(100))
                 {
                     ItemObject item = MBObjectManager.Instance.GetObject<ItemObject>(dropItem.DropItemId);
+                    if (attackerAgent.MissionPeer.GetNetworkPeer() == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        return false;
+                    }
                     PersistentEmpireRepresentative persistentEmpireRepresentative = attackerAgent.MissionPeer.GetNetworkPeer().GetComponent<PersistentEmpireRepresentative>();
                     Inventory inventory = persistentEmpireRepresentative.GetInventory();
                     InformationComponent.Instance.SendMessage("You gathered " + dropItem.DropAmount + "*" + item.Name.ToString(), Colors.Green.ToUnsignedInteger(), attackerAgent.MissionPeer.GetNetworkPeer());

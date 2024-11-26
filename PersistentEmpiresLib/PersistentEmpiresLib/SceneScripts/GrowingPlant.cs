@@ -122,6 +122,11 @@ namespace PersistentEmpiresLib.SceneScripts
             EquipmentIndex wieldedItemIndex = userAgent.GetWieldedItemIndex(Agent.HandIndex.MainHand);
             MissionWeapon wieldedItem = userAgent.Equipment[wieldedItemIndex];
             NetworkCommunicator networkCommunicator = userAgent.MissionPeer.GetNetworkPeer();
+            if (networkCommunicator == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return;
+            }
             PersistentEmpireRepresentative persistentEmpireRepresentative = networkCommunicator.GetComponent<PersistentEmpireRepresentative>();
 
 

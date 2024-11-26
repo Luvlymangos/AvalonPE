@@ -127,9 +127,15 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             reportDamage = true;
 #if SERVER
+            if (attackerAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return false;
+            }
             OfflineProtectionBehaviour offlineProtectionBehaviour = Mission.Current.GetMissionBehavior<OfflineProtectionBehaviour>();
             if ((!ladderBuilt && offlineProtectionBehaviour.IsOfflineProtectionActive))
             {
+                if (attackerAgent.MissionPeer.GetNetworkPeer() == null) return false;
                 InformationComponent.Instance.SendMessage("Offline protection is active", 0x02ab89d9, attackerAgent.MissionPeer.GetNetworkPeer());
                 return false;
             }
@@ -148,6 +154,7 @@ namespace PersistentEmpiresLib.SceneScripts
             {
                 reportDamage = false;
                 NetworkCommunicator player = attackerAgent.MissionPeer.GetNetworkPeer();
+                if (player == null) return false;
                 PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
                 if (persistentEmpireRepresentative == null) return false;
                 bool playerHasAllItems = this.receipt.All((r) => persistentEmpireRepresentative.GetInventory().IsInventoryIncludes(r.RepairItem, r.NeededCount));

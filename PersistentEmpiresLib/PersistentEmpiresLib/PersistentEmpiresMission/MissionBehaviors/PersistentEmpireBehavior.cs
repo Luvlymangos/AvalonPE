@@ -20,6 +20,8 @@ using Websocket.Client;
 using System.Text.RegularExpressions;
 using TaleWorlds.Engine;
 using Database.DBEntities;
+using TaleWorlds.PlayerServices;
+using Org.BouncyCastle.Bcpg;
 
 namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 {
@@ -65,7 +67,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         public override void OnAgentMount(Agent agent)
         {
             base.OnAgentMount(agent);
-            if (agent.IsPlayerControlled && agent.MissionPeer.GetNetworkPeer() != null)
+            if (agent.IsPlayerControlled && agent.MissionPeer != null)
             {
                 LoggerHelper.LogAnAction(agent.MissionPeer.GetNetworkPeer(), LogAction.PlayerMountedHorse, null, new object[] { agent });
             }
@@ -88,6 +90,11 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         }
         public override void OnAgentHit(Agent affectedAgent, Agent affectorAgent, in MissionWeapon affectorWeapon, in Blow blow, in AttackCollisionData attackCollisionData)
         {
+            if (affectorAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return;
+            }
             base.OnAgentHit(affectedAgent, affectorAgent, affectorWeapon, blow, attackCollisionData);
             if (affectedAgent.IsHuman && affectedAgent.IsPlayerControlled && affectedAgent.IsUsingGameObject)
             {
@@ -97,14 +104,18 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
             if (GameNetwork.IsServer && affectorAgent != null && affectedAgent != affectorAgent && affectorAgent.IsHuman && affectorAgent.IsPlayerControlled && affectorAgent.IsActive())
             {
-
                 NetworkCommunicator issuer = affectorAgent.MissionPeer.GetNetworkPeer();
+                if (issuer == null || !issuer.IsConnectionActive)
+                {
+                    Debug.Print("Agent's mission peer is null or disconnected");
+                    return;
+                }
                 NetworkCommunicator affected = null;
-                if (affectedAgent.IsHuman && affectedAgent.IsPlayerControlled)
+                if (affectedAgent.IsHuman && affectedAgent.IsPlayerControlled && affectedAgent.MissionPeer.GetNetworkPeer() != null)
                 {
                     affected = affectedAgent.MissionPeer.GetNetworkPeer();
                 }
-                else if (affectedAgent.IsMount && affectedAgent.RiderAgent != null && affectedAgent.RiderAgent.IsHuman && affectedAgent.RiderAgent.IsPlayerControlled)
+                else if (affectedAgent.IsMount && affectedAgent.RiderAgent != null && affectedAgent.RiderAgent.IsHuman && affectedAgent.RiderAgent.IsPlayerControlled && affectedAgent.RiderAgent.MissionPeer.GetNetworkPeer() != null)
                 {
                     affected = affectedAgent.RiderAgent.MissionPeer.GetNetworkPeer();
                 }
@@ -616,7 +627,18 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             int maxPlayer = MultiplayerOptions.OptionType.MaxNumberOfPlayers.GetIntValue(MultiplayerOptions.MultiplayerOptionsAccessMode.CurrentMapOptions);
             string serverName = MultiplayerOptions.OptionType.ServerName.GetStrValue(MultiplayerOptions.MultiplayerOptionsAccessMode.CurrentMapOptions);
 
-           
+            IEnumerable<GameEntity> Gatherables = Mission.Current.GetActiveEntitiesWithScriptComponentOfType<PE_ItemGathering>();
+            foreach (GameEntity entity in Gatherables)
+            {
+                PE_ItemGathering gather = entity.GetFirstScriptOfType<PE_ItemGathering>();
+                if (gather.Name == "Wheat")
+                {
+                    gather.DropCount = 2;
+                }
+            }
+
+
+
             IEnumerable<DBUpgradeableBuilding> dbUpgradeables = SaveSystemBehavior.HandleGetAllUpgradeableBuildings();
             List<PE_UpgradeableBuildings> upgradeables = base.Mission.GetActiveEntitiesWithScriptComponentOfType<PE_UpgradeableBuildings>().Select(g => g.GetFirstScriptOfType<PE_UpgradeableBuildings>()).ToList();
 

@@ -16,6 +16,9 @@ using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ScreenSystem;
 using PersistentEmpiresLib;
+using PersistentEmpiresLib.ErrorLogging;
+using TaleWorlds.Engine;
+using PersistentEmpiresMission.AIBehaviours.Data;
 
 namespace PersistentEmpires.Views.Views
 {
@@ -53,8 +56,9 @@ namespace PersistentEmpires.Views.Views
         public override void OnMissionScreenTick(float dt)
         {
             base.OnMissionScreenTick(dt);
-            if (this._dataSource == null) return;
             PersistentEmpireRepresentative myRepresentative = GameNetwork.MyPeer.GetComponent<PersistentEmpireRepresentative>();
+            
+            if (this._dataSource == null) return;
             if (myRepresentative != null)
             {
                 try
@@ -101,6 +105,59 @@ namespace PersistentEmpires.Views.Views
         public override void OnMissionTick(float dt)
         {
             base.OnMissionTick(dt);
+            PersistentEmpireRepresentative myRepresentative = GameNetwork.MyPeer.GetComponent<PersistentEmpireRepresentative>();
+            if (myRepresentative != null && myRepresentative.DebugMode)
+            {
+                MBDebug.ClearRenderObjects();
+                foreach (Agent agent in Mission.Current.Agents)
+                {   
+                    if (agent.MissionPeer != null) continue;
+                    if (agent != null)
+                    {
+                        // Get the forward direction of the agent on the XZ plane
+                        Vec3 forwardDirection = agent.LookFrame.rotation.f;
+                        forwardDirection.z = 0; // Flatten the direction to the horizontal plane
+                        forwardDirection = forwardDirection.NormalizedCopy(); // Normalize to ensure it has unit length
+
+                        // Define the rotation angles (60 degrees in both directions)
+                        float angleRadiansPositive = MathF.PI / 3;  // 60 degrees in radians
+                        float angleRadiansNegative = -MathF.PI / 3; // -60 degrees in radians
+
+                        // Compute the rotated directions
+                        Vec3 rotatedDirectionPositive = new Vec3(
+                            forwardDirection.x * MathF.Cos(angleRadiansPositive) - forwardDirection.y * MathF.Sin(angleRadiansPositive),
+                            forwardDirection.x * MathF.Sin(angleRadiansPositive) + forwardDirection.y * MathF.Cos(angleRadiansPositive),
+                            0 // Keep it flat on the XZ plane
+                        );
+
+                        Vec3 rotatedDirectionNegative = new Vec3(
+                            forwardDirection.x * MathF.Cos(angleRadiansNegative) - forwardDirection.y * MathF.Sin(angleRadiansNegative),
+                            forwardDirection.x * MathF.Sin(angleRadiansNegative) + forwardDirection.y * MathF.Cos(angleRadiansNegative),
+                            0 // Keep it flat on the XZ plane
+                        ); 
+                        Vec3 directionToAgent = GameNetwork.MyPeer.ControlledAgent.Position - agent.Position;
+                        // Render debug arrows for both directions
+                        MBDebug.RenderDebugLine(agent.Position, rotatedDirectionPositive * 30, 4278190335); // Positive 60 degrees
+                        MBDebug.RenderDebugLine(agent.Position, rotatedDirectionNegative * 30, 4294901760);
+                        MBDebug.RenderDebugLine(agent.Position, directionToAgent, 4294901760);// Negative 60 degrees
+                        //if (agent.IsAIControlled && agent.GetComponent<BanditAgentComponent>() != null)
+                        //{
+                        //    BanditAgentComponent BAC = agent.GetComponent<BanditAgentComponent>();
+                        //    if (BAC != null)
+                        //    {
+                        //        foreach (var i in BAC.PerceivedAgents)
+                        //        {
+                        //            MBDebug.RenderDebugLine(agent.Position, , 4294901760);
+                        //        }
+
+
+
+
+                        //    }
+                        //}
+                    }
+                }
+            }
             if (this._gauntletLayer != null && this.IsActive && (this._gauntletLayer.Input.IsHotKeyReleased("ToggleEscapeMenu") || this._gauntletLayer.Input.IsHotKeyReleased("Exit")))
             {
                 this.Close();

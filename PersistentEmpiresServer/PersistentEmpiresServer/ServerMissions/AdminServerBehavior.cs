@@ -16,6 +16,7 @@ using TaleWorlds.MountAndBlade;
 using TaleWorlds.ModuleManager;
 using TaleWorlds.ObjectSystem;
 using TaleWorlds.MountAndBlade.DedicatedCustomServer;
+using TaleWorlds.Diamond;
 
 namespace PersistentEmpiresServer.ServerMissions
 {
@@ -90,6 +91,22 @@ namespace PersistentEmpiresServer.ServerMissions
                 GameNetwork.EndModuleEventAsServer();
             }
         }
+
+        //REMOVE THIS AFTER EVENT
+        //public override void OnAgentRemoved(Agent affectedAgent, Agent affectorAgent, AgentState agentState, KillingBlow blow)
+        //{
+        //    base.OnAgentRemoved(affectedAgent, affectorAgent, agentState, blow);
+        //    if (GameNetwork.IsServer)
+        //    {
+        //        if (agentState == AgentState.Killed && !affectedAgent.MissionPeer.GetNetworkPeer().QuitFromMission && affectedAgent.MissionPeer != null && !Main.IsAdmin(affectedAgent.MissionPeer.GetNetworkPeer()))
+        //        {
+        //            this.BanPlayer(affectedAgent.MissionPeer.GetNetworkPeer(), 600 * 600);
+        //            OnBanPlayer(affectedAgent.MissionPeer.GetNetworkPeer().VirtualPlayer.Id.ToString(), affectedAgent.MissionPeer.GetNetworkPeer().UserName, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 10000 * 24 * 60 * 60);
+        //            InformationComponent.Instance.BroadcastQuickInformation($"{affectedAgent.MissionPeer.GetNetworkPeer().UserName} HAS BEEN BANNED");
+        //        }
+        //    }
+        //}
+
         public bool IsPlayerAdmin(NetworkCommunicator player)
         {
             if (!File.Exists(AdminPlayerFilePath())) return false;

@@ -31,7 +31,7 @@ namespace PersistentEmpiresServer.SpawnBehavior
         {
 
             base.Initialize(spawnComponent);
-            this.PersistPosition = ConfigManager.GetBoolConfig("PersistDisconnectPosition", false);
+            this.PersistPosition = ConfigManager.GetBoolConfig("PersistDisconnectPosition", true);
         }
 
         public override int GetMaximumReSpawnPeriodForPeer(MissionPeer peer)

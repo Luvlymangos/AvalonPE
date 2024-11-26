@@ -89,6 +89,11 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             if(GameNetwork.IsServer && affectedAgent.MissionPeer != null && affectedAgent.IsHuman && affectedAgent.IsPlayerControlled)
             {
                 NetworkCommunicator player = affectedAgent.MissionPeer.GetNetworkPeer();
+                if (player == null)
+                {
+                    Debug.Print("Representitive Is null");
+                    return;
+                }
                 if (this.OpenedByPeerInventory.ContainsKey(player))
                 {
                     if (this.OpenedByPeerInventory[player] != null)

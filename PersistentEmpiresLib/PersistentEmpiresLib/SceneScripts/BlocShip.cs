@@ -301,7 +301,17 @@ namespace PersistentEmpiresLib.SceneScripts
                 )
             {
                 reportDamage = false;
+                if (attackerAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return false;
+                }
                 NetworkCommunicator player = attackerAgent.MissionPeer.GetNetworkPeer();
+                if (player == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return false;
+                }
                 PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
                 if (persistentEmpireRepresentative == null) return false;
                 bool playerHasAllItems = this.receipt.All((r) => persistentEmpireRepresentative.GetInventory().IsInventoryIncludes(r.RepairItem, r.NeededCount));
