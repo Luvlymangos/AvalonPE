@@ -59,7 +59,17 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
             if (chance >= 1 && chance < 25)
             {
+                if (picker.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return false;
+                }
                 NetworkCommunicator player = picker.MissionPeer.GetNetworkPeer();
+                if (player == null || !player.IsConnectionActive)
+                {
+                    Debug.Print("Agent's mission peer is null or disconnected");
+                    return false;
+                }
                 InformationComponent.Instance.SendMessage("Lockpicked successfully but your lockpick destroyed", Colors.Green.ToUnsignedInteger(), player);
                 Debug.Print("Lockpicked, crash test");
                 pickedAgents[picker] = 5;
@@ -72,21 +82,51 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
             if (chance >= 25 && chance < 50)
             {
+                if (picker.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return false;
+                }
                 NetworkCommunicator player = picker.MissionPeer.GetNetworkPeer();
+                if (player == null || !player.IsConnectionActive)
+                {
+                    Debug.Print("Agent's mission peer is null or disconnected");
+                    return false;
+                }
                 InformationComponent.Instance.SendMessage("Lockpicked successfully", Colors.Green.ToUnsignedInteger(), player);
                 return true;
             }
 
             if (chance >= 50 && chance < 75)
             {
+                if (picker.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return false;
+                }
                 NetworkCommunicator player = picker.MissionPeer.GetNetworkPeer();
+                if (player == null || !player.IsConnectionActive)
+                {
+                    Debug.Print("Agent's mission peer is null or disconnected");
+                    return false;
+                }
                 InformationComponent.Instance.SendMessage("Try again", Colors.Red.ToUnsignedInteger(), player);
                 return false;
             }
 
             if (chance >= 75 && chance < 100)
             {
+                if (picker.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return false;
+                }
                 NetworkCommunicator player = picker.MissionPeer.GetNetworkPeer();
+                if (player == null || !player.IsConnectionActive)
+                {
+                    Debug.Print("Agent's mission peer is null or disconnected");
+                    return false;
+                }
                 InformationComponent.Instance.SendMessage("Your lockpick destroyed", Colors.Red.ToUnsignedInteger(), player);
                 Debug.Print("Lockpicked, crash test");
                 pickedAgents[picker] = 5;

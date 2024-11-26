@@ -28,6 +28,11 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             if(affectorAgent != null && affectorAgent != affectedAgent && affectorAgent.IsActive() && affectorAgent.IsHuman && affectedAgent != null && affectedAgent.MissionPeer != null && affectedAgent.MissionPeer.GetNetworkPeer().QuitFromMission == false && affectedAgent.IsHuman && affectedAgent.IsActive() && affectorWeapon.Item != null && affectorWeapon.Item.StringId != "pe_doctorscalpel")
             {
                 NetworkCommunicator player = affectedAgent.MissionPeer.GetNetworkPeer();
+                if (player == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 this.WarnPlayer(player);
                 this.CombatLogTimer[player] = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + Duration;
             }
@@ -49,13 +54,13 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         public override void OnAgentRemoved(Agent affectedAgent, Agent affectorAgent, AgentState agentState, KillingBlow blow)
         {
             base.OnAgentRemoved(affectedAgent, affectorAgent, agentState, blow);
-            /*if(affectedAgent != null && affectedAgent.MissionPeer != null)
-            {
-                if(this.CombatLogTimer.ContainsKey(affectedAgent.MissionPeer.GetNetworkPeer()))
-                {
-                    this.CombatLogTimer.Remove(affectedAgent.MissionPeer.GetNetworkPeer());
-                }
-            }*/
+            //if (affectedAgent != null && affectedAgent.MissionPeer != null && affectedAgent.State.HasFlag(AgentState.Killed))
+            //{
+            //    if (this.CombatLogTimer.ContainsKey(affectedAgent.MissionPeer.GetNetworkPeer()))
+            //    {
+            //        this.CombatLogTimer.Remove(affectedAgent.MissionPeer.GetNetworkPeer());
+            //    }
+            //}
         }
 
         public void WarnPlayer(NetworkCommunicator player)

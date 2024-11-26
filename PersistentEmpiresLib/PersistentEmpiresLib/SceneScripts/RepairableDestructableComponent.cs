@@ -193,7 +193,13 @@ namespace PersistentEmpiresLib.SceneScripts
         protected override bool OnHit(Agent attackerAgent, int damage, Vec3 impactPosition, Vec3 impactDirection, in MissionWeapon weapon, ScriptComponentBehavior attackerScriptComponentBehavior, out bool reportDamage)
         {
             reportDamage = true;
+            if (attackerAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return false;
+            }
             MissionWeapon missionWeapon = weapon;
+            if (attackerAgent.IsAIControlled) return false;
             WeaponComponentData currentUsageItem = missionWeapon.CurrentUsageItem;
             if (
                 attackerAgent != null &&

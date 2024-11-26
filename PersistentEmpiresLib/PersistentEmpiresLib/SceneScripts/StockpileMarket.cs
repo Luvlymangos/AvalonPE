@@ -262,6 +262,7 @@ namespace PersistentEmpiresLib.SceneScripts
 
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null) return;
                 this.stockpileMarketComponent.OpenStockpileMarketForPeer(this, userAgent.MissionPeer.GetNetworkPeer());
                 userAgent.StopUsingGameObjectMT(true);
             }
@@ -302,9 +303,15 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             reportDamage = false;
             if (attackerAgent == null) return false;
+            if (attackerAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return false;
+            }
             NetworkCommunicator player = attackerAgent.MissionPeer.GetNetworkPeer();
+            if (player == null) return false;
             bool isAdmin = Main.IsPlayerAdmin(player);
-            if (isAdmin && weapon.Item != null && weapon.Item.StringId == "pe_adminstockfiller")
+            if (isAdmin && weapon.Item != null && weapon.Item.StringId == "Mythic_pe_adminhammer")
             {
                 foreach (MarketItem marketItem in this.MarketItems)
                 {

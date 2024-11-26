@@ -198,7 +198,7 @@ namespace PersistentEmpiresLib.SceneScripts
         public void OpenInventory(Agent userAgent)
         {
             Mission.Current.MakeSound(SoundEvent.GetEventIdFromString("event:/mission/movement/foley/door_open"), base.GameEntity.GetGlobalFrame().origin, false, true, -1, -1);
-
+            if (userAgent.MissionPeer == null) return;
             this.playerInventoryComponent.OpenInventoryForPeer(userAgent.MissionPeer.GetNetworkPeer(), this.InventoryId);
             // userAgent.StopUsingGameObjectMT(true);
         }
@@ -208,7 +208,11 @@ namespace PersistentEmpiresLib.SceneScripts
             base.OnUse(userAgent);
             Debug.Print("[USING LOG] AGENT USE " + this.GetType().Name + " ID " + this.InventoryId + " PLAYER " + userAgent.MissionPeer.DisplayedName);
             if (this.GameEntity == null || this.InteractionEntity == null) return;
-
+            if (userAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return;
+            }
             NetworkCommunicator player = userAgent.MissionPeer.GetNetworkPeer();
             if (player == null) return;
             bool canUserUse = true;

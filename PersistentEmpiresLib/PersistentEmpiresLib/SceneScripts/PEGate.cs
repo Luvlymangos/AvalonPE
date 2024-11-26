@@ -66,6 +66,11 @@ namespace PersistentEmpiresLib.SceneScripts
         }
         public override void OnUse(Agent userAgent)
         {
+            if (userAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return;
+            }
             if (!base.IsUsable(userAgent))
             {
                 userAgent.StopUsingGameObjectMT(false);
@@ -93,6 +98,7 @@ namespace PersistentEmpiresLib.SceneScripts
                         if (userAgent.MissionPeer.GetComponent<PersistentEmpireRepresentative>().GetHouse() == house.Houses[this.HouseIndex] || house.Houses[this.HouseIndex].marshalls.Contains(userAgent.MissionPeer.Peer.Id.ToString()))
                         {
                             NetworkCommunicator player2 = userAgent.MissionPeer.GetNetworkPeer();
+                            if (player2 == null) return;
                             InformationComponent.Instance.SendMessage("Welcome Home", 0x0606c2d9, player2);
                             this.ToggleDoor();
                             return;
@@ -100,12 +106,14 @@ namespace PersistentEmpiresLib.SceneScripts
                         else
                         {
                             NetworkCommunicator player2 = userAgent.MissionPeer.GetNetworkPeer();
+                            if (player2 == null) return;
                             InformationComponent.Instance.SendMessage("This door is locked", 0x0606c2d9, player2);
                             return;
                         }
                     }
                     bool canPlayerUse = true;
                     NetworkCommunicator player = userAgent.MissionPeer.GetNetworkPeer();
+                    if (player == null) return;
                     if (this.CastleId > -1)
                     {
                         canPlayerUse = false;
@@ -162,8 +170,15 @@ namespace PersistentEmpiresLib.SceneScripts
 #if SERVER
             if (GameNetwork.IsServer)
             {
+                if (attackerAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return false;
+                }
                 if (offlineProtectionBehaviour.IsOfflineProtectionActive && offlineProtectionBehaviour != null)
                 {
+                    NetworkCommunicator player = attackerAgent.MissionPeer.GetNetworkPeer();
+                    if (player == null) return false;
                     InformationComponent.Instance.SendMessage("Offline protection is active", 0x02ab89d9, attackerAgent.MissionPeer.GetNetworkPeer());
                     PE_RepairableDestructableComponent destructComponent = base.GameEntity.GetFirstScriptOfType<PE_RepairableDestructableComponent>();
                     if (destructComponent != null)

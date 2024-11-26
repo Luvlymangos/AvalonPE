@@ -140,7 +140,17 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 else if (action.EatingEndsAt < DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() && agent.GetWieldedItemIndex(Agent.HandIndex.MainHand) != EquipmentIndex.None)
                 {
                     agent.SetActionChannel(0, ActionIndexCache.act_none, true, 0UL, 0.0f, 1f, -0.2f, 0.4f, 0f, false, -0.2f, 0, true);
+                    if (agent.MissionPeer == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        continue;
+                    }
                     NetworkCommunicator peer = agent.MissionPeer.GetNetworkPeer();
+                    if (peer == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        continue;
+                    }
                     PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
                     persistentEmpireRepresentative.SetHunger(persistentEmpireRepresentative.GetHunger() + action.Food.Hunger);
 

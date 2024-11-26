@@ -59,11 +59,17 @@ namespace PersistentEmpiresLib.SceneScripts
         public override void OnUse(Agent userAgent)
         {
             base.OnUse(userAgent);
+
             Debug.Print("[USING LOG] AGENT USE " + this.GetType().Name);
 
             userAgent.StopUsingGameObjectMT(true);
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 if (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - this.lastOpened > this.Delay)
                 {
                     SkillObject AdminSkill = MBObjectManager.Instance.GetObject<SkillObject>("Athletics");
@@ -74,6 +80,7 @@ namespace PersistentEmpiresLib.SceneScripts
                     }
                     bool canPlayerUse = true;
                     NetworkCommunicator player = userAgent.MissionPeer.GetNetworkPeer();
+                    if (player == null) return;
                     if (this.CastleId > -1)
                     {
                         canPlayerUse = false;

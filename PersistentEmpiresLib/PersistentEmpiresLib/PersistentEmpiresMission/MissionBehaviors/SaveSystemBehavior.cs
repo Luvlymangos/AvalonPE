@@ -16,6 +16,8 @@ using System.IO;
 using Database.DBEntities;
 using System.CodeDom;
 using SharpRaven.Data.Context;
+using PersistentEmpiresLib.Helpers;
+using PersistentEmpiresLib.NetworkMessages.Client;
 
 namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 {
@@ -119,6 +121,9 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
         public delegate bool IsPlayerWhitelisted(string player);
 
+
+        public delegate void BanPlayerDelegate(string PlayerId, string PlayerName, long BanEndsAt);
+        public static event BanPlayerDelegate OnBanPlayer;
 
         /*Castles*/
         public delegate IEnumerable<DBCastle> GetCastles();
@@ -312,6 +317,28 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             }
 
             return null;
+        }
+
+        public bool HandleRequestPermBan(NetworkCommunicator Player)
+        {
+            
+            if (Player == null)
+            {
+                Debug.Print("Player is false");
+                return false;
+                
+            }
+            if (OnBanPlayer == null)
+            {
+                Debug.Print("On Ban Player is false");
+                return false;
+            }
+            else
+            {
+                OnBanPlayer(Player.VirtualPlayer.Id.ToString(), Player.UserName, DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 10000 * 24 * 60 * 60);
+            }
+            InformationComponent.Instance.BroadcastAnnouncement($"{Player.UserName} Has been Banned!");
+            return true;
         }
 
         public static IEnumerable<DBMoneyChest> HandleGetAllMoneyChests()

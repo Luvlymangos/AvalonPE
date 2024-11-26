@@ -68,11 +68,16 @@ namespace PersistentEmpiresLib.SceneScripts
             reportDamage = false;
             if (this.Lockpickable == false) return false;
             if (this.CastleId == -1) return false;
-
+            if (attackerAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return false;
+            }
             bool lockPickSuccess = LockpickingBehavior.Instance.Lockpick(attackerAgent, weapon);
             if (lockPickSuccess)
             {
                 // this.WithdrawGold(attackerAgent.MissionPeer.GetNetworkPeer(), this.Gold > 1000000 ? 1000000 : (int)this.Gold);
+                if (attackerAgent.MissionPeer.GetNetworkPeer() == null) return false;
                 PersistentEmpireRepresentative persistentEmpireRepresentative = attackerAgent.MissionPeer.GetNetworkPeer().GetComponent<PersistentEmpireRepresentative>();
                 long amount = this.Gold;
                 if(amount > 1000000)
@@ -161,6 +166,11 @@ namespace PersistentEmpiresLib.SceneScripts
         }
         public override void OnUse(Agent userAgent)
         {
+            if (userAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return;
+            }
             if (!base.IsUsable(userAgent))
             {
                 userAgent.StopUsingGameObjectMT(false);

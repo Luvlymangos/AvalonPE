@@ -9,6 +9,7 @@ using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using System.Runtime.CompilerServices;
 using PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors;
+using Debug = PersistentEmpiresClient.ViewsVM.AdminPanel.Buttons.Debug;
 
 namespace PersistentEmpires.Views.ViewsVM.AdminPanel
 {
@@ -34,6 +35,7 @@ namespace PersistentEmpires.Views.ViewsVM.AdminPanel
                 new TpTo(),
                 new Heal(),
                 new UnWound(),
+                new Debug(),
             };
 
             // Config value is just red on server. This cant be used, and making call to check this value feels like overkill

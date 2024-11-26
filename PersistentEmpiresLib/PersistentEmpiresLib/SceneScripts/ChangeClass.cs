@@ -171,17 +171,26 @@ namespace PersistentEmpiresLib.SceneScripts
             base.OnUseStopped(userAgent, isSuccessful, preferenceIndex);
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
+                if (!userAgent.MissionPeer.GetNetworkPeer().IsConnectionActive) return;
                 Debug.Print("[USING LOG] AGENT USE STOPPED " + this.GetType().Name);
                 MultiplayerClassDivisions.MPHeroClass heroClass = this.GetHeroClass();
-                //if (heroClass == null)
-                //{
-                //    Debug.Print("** PE ERROR** " + this.ClassId + " CANNOT FOUND ON MPHERO XML FILE.");
-                //    return;
-                //}
+                if (heroClass == null)
+                {
+                    Debug.Print("** PE ERROR** " + this.ClassId + " CANNOT FOUND ON MPHERO XML FILE.");
+                    return;
+                }
                 NetworkCommunicator player = userAgent.MissionPeer.GetNetworkPeer();
+                if (player == null) return;
                 PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
+                if (persistentEmpireRepresentative == null) return;
 
                 Faction f = this.GetCastleBanner().GetOwnerFaction();
+                if (f == null) return;
                 //if (LordClass && f.lordId != userAgent.MissionPeer.GetNetworkPeer().VirtualPlayer.Id.ToString())
                 //{
                 //    InformationComponent.Instance.SendMessage("You need to be the lord of " + f.name + " To claim this class.", (new Color(1f, 0, 0)).ToUnsignedInteger(), player);
@@ -197,7 +206,9 @@ namespace PersistentEmpiresLib.SceneScripts
                     //}
                     //persistentEmpireRepresentative.SetClass(this.ClassId);
                     int joinedFrom = persistentEmpireRepresentative.GetFactionIndex();
+
                     PE_CastleBanner banner = this.GetCastleBanner();
+                    if (banner == null) return;
                     int joinedTo = 0;
                     if (banner != null && this.JoinCastleFaction)
                     {
@@ -209,7 +220,7 @@ namespace PersistentEmpiresLib.SceneScripts
                     }
 
                     FactionsBehavior factionsBehavior = Mission.Current.GetMissionBehavior<FactionsBehavior>();
-
+                    if (factionsBehavior == null) return;
                     AgentHelpers.RespawnAgentOnPlaceForFaction(userAgent, joinedTo == -1 ? null : factionsBehavior.Factions[joinedTo], null, heroClass.HeroCharacter);
                     factionsBehavior.SetPlayerFaction(player, joinedTo, joinedFrom);
                     if (this.LordClass)
@@ -237,6 +248,11 @@ namespace PersistentEmpiresLib.SceneScripts
 
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 Debug.Print("[USING LOG] AGENT USE " + this.GetType().Name);
 
                 if (base.HasUser)
@@ -251,6 +267,11 @@ namespace PersistentEmpiresLib.SceneScripts
                     return;
                 }
                 NetworkCommunicator player = userAgent.MissionPeer.GetNetworkPeer();
+                if (player == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
                 PE_CastleBanner banner = this.GetCastleBanner();
                 if (persistentEmpireRepresentative == null) return;

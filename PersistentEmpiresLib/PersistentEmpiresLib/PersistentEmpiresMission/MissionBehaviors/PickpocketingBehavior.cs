@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ObjectSystem;
 
@@ -28,15 +29,30 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 
         public override void OnAgentHit(Agent affectedAgent, Agent affectorAgent, in MissionWeapon affectorWeapon, in Blow blow, in AttackCollisionData attackCollisionData)
         {
+
             base.OnAgentHit(affectedAgent, affectorAgent, affectorWeapon, blow, attackCollisionData);
             if (GameNetwork.IsClient) return;
             SkillObject pickpocketingSkill = MBObjectManager.Instance.GetObject<SkillObject>("Pickpocketing");
-
+            if (affectorAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return;
+            }
+            if (affectedAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return;
+            }
 
             if (affectedAgent.IsPlayerControlled && affectorAgent != null && affectorAgent.IsPlayerControlled && affectorWeapon.Item != null && affectorWeapon.Item.StringId == this.ItemId && affectorAgent.Character.GetSkillValue(pickpocketingSkill) >= this.RequiredPickpocketing && blow.VictimBodyPart != BoneBodyPartType.None)
             {
                 PersistentEmpireRepresentative representativeAffected = affectedAgent.MissionPeer.GetNetworkPeer().GetComponent<PersistentEmpireRepresentative>();
                 PersistentEmpireRepresentative representativeAffector = affectorAgent.MissionPeer.GetNetworkPeer().GetComponent<PersistentEmpireRepresentative>();
+                if (representativeAffected == null || representativeAffector == null)
+                {
+                    Debug.Print("Representitive Is null");
+                    return;
+                }
 
                 if (representativeAffected == null || representativeAffector == null) return;
 

@@ -16,6 +16,10 @@ using TaleWorlds.MountAndBlade;
 using TaleWorlds.ObjectSystem;
 using static TaleWorlds.MountAndBlade.Agent;
 using Data;
+using static TaleWorlds.Library.Debug;
+using System.Xml;
+using TaleWorlds.ModuleManager;
+using System.IO;
 
 namespace PersistentEmpiresMission.MissionBehaviors
 {
@@ -36,77 +40,66 @@ namespace PersistentEmpiresMission.MissionBehaviors
             factionbehavior = Mission.Current.GetMissionBehavior<FactionsBehavior>();
             base.OnBehaviorInitialize();
             Debug.Print("[AvalonHCRP] Gate Guard Behaviour Initialized");
-            List<int> LordSoundEvents = new List<int>();
-            List<int> FriendSoundEvents = new List<int>();
-            List<int> NeutralSoundEvents = new List<int>();
-            LordSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_BB_LR1"));
-            LordSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_BB_LR2"));
-            FriendSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_BB_FR1"));
-            FriendSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_BB_FR2"));
-            NeutralSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_BB_NU1"));
-            NeutralSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_BB_NU2"));
-            GuardTypes.Add(new GuardTypeClass(1, "guard", "Gate_Guard",
-                new List<int>(LordSoundEvents),
-                new List<int>(FriendSoundEvents),
-                new List<int>(NeutralSoundEvents)));
 
-            // Second GuardTypeClass
-            LordSoundEvents = new List<int>(); // Create new instances
-            FriendSoundEvents = new List<int>();
-            NeutralSoundEvents = new List<int>();
-            
-            LordSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_Lord1"));
-            LordSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_Lord2"));
-            FriendSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_FN_FR1"));
-            FriendSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_FN_FR2"));
-            NeutralSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_FN_NU1"));
-            NeutralSoundEvents.Add(SoundEvent.GetEventIdFromString("Guard_FN_NU2"));
+            string GuardPath = ModuleHelper.GetXmlPath("PersistentEmpires", "Guards");
+            Debug.Print("[PE] Trying Loading " + GuardPath, 0, DebugColor.Cyan);
+            if (File.Exists(GuardPath) == false) return;
 
-            GuardTypes.Add(new GuardTypeClass(2, "guard", "Finnin_Guard",
-                new List<int>(LordSoundEvents),
-                new List<int>(FriendSoundEvents),
-                new List<int>(NeutralSoundEvents)));
-
-
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.Load(GuardPath);
+            foreach (XmlNode node in xmlDocument.SelectNodes("/Guards/Guard"))
+            {
+                int GuardID = int.Parse(node["GuardID"].InnerText);
+                string GuardType = node["GuardType"].InnerText;
+                string GuardClass = node["GuardClass"].InnerText;
+                List<int> LordSoundEventsRaw = ParseGuardsSounds(node["LordSoundEvents"].InnerText);
+                List<int> FriendlySoundEventsRaw = ParseGuardsSounds(node["FriendlySoundEvents"].InnerText);
+                List<int> EnemySoundEventsRaw = ParseGuardsSounds(node["EnemySoundEvents"].InnerText);
+                List<int> NeutralSoundEventsRaw = ParseGuardsSounds(node["NeutralSoundEvents"].InnerText);
+                GuardTypeClass Guard = new GuardTypeClass(GuardID, GuardType, GuardClass, LordSoundEventsRaw, FriendlySoundEventsRaw, NeutralSoundEventsRaw);
+                this.GuardTypes.Add(Guard);
+            }
         }
+        
 
-        //public override void OnAgentRemoved(Agent affectedAgent, Agent affectorAgent, AgentState agentState, KillingBlow blow)
-        //{
-        //    base.OnAgentRemoved(affectedAgent, affectorAgent, agentState, blow);
-        //    if (Guards.ContainsKey(affectedAgent))
-        //    {
-        //        affectedAgent.FadeOut(true, true);
-        //        PE_GuardPost station = Guards[affectedAgent];
-        //        station.Guard = null;
-        //        Guards.Remove(affectedAgent);
-        //        station.RespawnTime = station.MaxRespawnTime;
-        //        station.GuardType = null;
-        //    }
-        //}
+
+            
+        public List<int> ParseGuardsSounds(string soundstring)
+        {
+            List<int> sounds = new List<int>();
+            string[] soundarray = soundstring.Split('|');
+            foreach (string sound in soundarray)
+            {
+                Debug.Print("Sound: " + sound);
+                sounds.Add(SoundEvent.GetEventIdFromString(sound));
+            }
+            return sounds;
+        }
+      
     
 
         public override void OnMissionTick(float dt)
         {
-            base.OnMissionTick(dt);
-            IEnumerable<GameEntity> GuardPosts = Mission.Current.GetActiveEntitiesWithScriptComponentOfType<PE_GuardPost>();
-            if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - lastcheck > 1)
-            {
-                Debug.Print("TimeCheck");
-                lastcheck = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                foreach (GameEntity Post in GuardPosts)
-                {
+            //base.OnMissionTick(dt);
+            //IEnumerable<GameEntity> GuardPosts = Mission.Current.GetActiveEntitiesWithScriptComponentOfType<PE_GuardPost>();
+            //if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - lastcheck > 1)
+            //{
+            //    Debug.Print("TimeCheck");
+            //    lastcheck = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            //    foreach (GameEntity Post in GuardPosts)
+            //    {
 
-                    PE_GuardPost Station = Post.GetFirstScriptOfType<PE_GuardPost>();
-                    if (Station.Guard == null && Station.RespawnTime == 0)
-                    {
-                        SpawnBot(Station);
-                    }
-                    if (Station.Guard == null && Station.RespawnTime > 0)
-                    {
-                        Station.RespawnTime -= 1;
-                    }
-                }
-            }
+            //        PE_GuardPost Station = Post.GetFirstScriptOfType<PE_GuardPost>();
+            //        if (Station.Guard == null && Station.RespawnTime == 0)
+            //        {
+            //            SpawnBot(Station);
+            //        }
+            //        if (Station.Guard == null && Station.RespawnTime > 0)
+            //        {
+            //            Station.RespawnTime -= 1;
+            //        }
+            //    }
+            //}
 
             foreach (var guard in Guards)
             {
@@ -251,6 +244,17 @@ namespace PersistentEmpiresMission.MissionBehaviors
                             GuardsAcknowleding[agent].Add(a);
                         }
                     }
+                    if (a.MissionPeer == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        return;
+                    }
+                    if (a.MissionPeer.GetNetworkPeer() == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        return;
+                    }
+
                     else if (faction.members.Contains(a.MissionPeer.GetNetworkPeer()))
                     {
                         int speakchance = MBRandom.RandomInt(0, 100);
@@ -285,21 +289,27 @@ namespace PersistentEmpiresMission.MissionBehaviors
 
         public override void OnAgentHit(Agent affectedAgent, Agent affectorAgent, in MissionWeapon affectorWeapon, in Blow blow, in AttackCollisionData attackCollisionData)
         {
+            if (affectedAgent == null) return;
+            if (affectorAgent == null) return;
             Debug.Print("Agent Hit");
             base.OnAgentHit(affectedAgent, affectorAgent, affectorWeapon, blow, attackCollisionData);
-            if (!Guards.ContainsKey(affectedAgent)) return;
-            if (Guards.ContainsKey(affectorAgent)) return;
-            affectedAgent.SetTargetAgent(affectorAgent);
-            affectedAgent.AIStateFlags |= AIStateFlag.Alarmed;
+            if (Guards.ContainsKey(affectedAgent))
+            {
+                affectedAgent.SetTargetAgent(affectorAgent);
+                affectedAgent.AIStateFlags |= AIStateFlag.Alarmed;
+            }
         }
 
         public override void OnMissileHit(Agent attacker, Agent victim, bool isCanceled, AttackCollisionData collisionData)
         {
+            if (attacker == null) return;
+            if (victim == null) return;
             base.OnMissileHit(attacker, victim, isCanceled, collisionData);
-            if (!Guards.ContainsKey(victim)) return;
-            if (Guards.ContainsKey(attacker)) return;
-            victim.SetTargetAgent(attacker);
-            victim.AIStateFlags |= AIStateFlag.Alarmed;
+            if (Guards.ContainsKey(victim))
+            {
+                victim.SetTargetAgent(attacker);
+                victim.AIStateFlags |= AIStateFlag.Alarmed;
+            }
         }
     
 

@@ -149,7 +149,17 @@ namespace PersistentEmpiresLib.SceneScripts
                 if (GameNetwork.IsServer)
                 {
                     this.CurrentCount--;
+                    if (userAgent.MissionPeer == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        return;
+                    }
                     NetworkCommunicator peer = userAgent.MissionPeer.GetNetworkPeer();
+                    if (peer == null)
+                    {
+                        Debug.Print("Agent's mission peer is null");
+                        return;
+                    }
                     PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
                     Inventory playerInventory = persistentEmpireRepresentative.GetInventory();
                     playerInventory.AddCountedItemSynced(this.DropsItemObject, this.DropCount, ItemHelper.GetMaximumAmmo(this.DropsItemObject));
@@ -171,6 +181,17 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
+                if (userAgent.MissionPeer.GetNetworkPeer() == null)
+                {
+                    Debug.Print("Peer is null");
+                    return;
+                }
+                NetworkCommunicator peer = userAgent.MissionPeer.GetNetworkPeer();
                 Debug.Print("[USING LOG] AGENT USE " + this.GetType().Name);
 
                 if (base.HasUser)
@@ -181,7 +202,7 @@ namespace PersistentEmpiresLib.SceneScripts
                 SkillObject requiredSkillObject = MBObjectManager.Instance.GetObject<SkillObject>(this.RequiredSkillId);
                 if (userAgent.Character.GetSkillValue(requiredSkillObject) < this.RequiredSkill)
                 {
-                    InformationComponent.Instance.SendMessage("You are not qualified enough", new Color(1f, 0, 0).ToUnsignedInteger(), userAgent.MissionPeer.GetNetworkPeer());
+                    InformationComponent.Instance.SendMessage("You are not qualified enough", new Color(1f, 0, 0).ToUnsignedInteger(), peer);
                     userAgent.StopUsingGameObjectMT(false);
                     return;
                 }
@@ -189,7 +210,7 @@ namespace PersistentEmpiresLib.SceneScripts
                 // MissionWeapon wieldedItem = userAgent.Equipment[wieldedItemIndex];
                 if (this.NeededItem == "" && wieldedItemIndex != EquipmentIndex.None)
                 {
-                    InformationComponent.Instance.SendMessage("You need to empty your hands.", new Color(1f, 0, 0).ToUnsignedInteger(), userAgent.MissionPeer.GetNetworkPeer());
+                    InformationComponent.Instance.SendMessage("You need to empty your hands.", new Color(1f, 0, 0).ToUnsignedInteger(), peer);
                     userAgent.StopUsingGameObjectMT(false);
                     return;
                 }
@@ -198,7 +219,7 @@ namespace PersistentEmpiresLib.SceneScripts
                     if (wieldedItemIndex == EquipmentIndex.None)
                     {
                         ItemObject need = MBObjectManager.Instance.GetObject<ItemObject>(this.NeededItem);
-                        InformationComponent.Instance.SendMessage("You need a " + need.Name.ToString() + " to do this.", new Color(1f, 0, 0).ToUnsignedInteger(), userAgent.MissionPeer.GetNetworkPeer());
+                        InformationComponent.Instance.SendMessage("You need a " + need.Name.ToString() + " to do this.", new Color(1f, 0, 0).ToUnsignedInteger(), peer);
                         userAgent.StopUsingGameObjectMT(false);
                         return;
                     }
@@ -208,7 +229,7 @@ namespace PersistentEmpiresLib.SceneScripts
                         if (wieldedItem.Item.StringId != this.NeededItem)
                         {
                             ItemObject need = MBObjectManager.Instance.GetObject<ItemObject>(this.NeededItem);
-                            InformationComponent.Instance.SendMessage("You need a " + need.Name.ToString() + " to do this.", new Color(1f, 0, 0).ToUnsignedInteger(), userAgent.MissionPeer.GetNetworkPeer());
+                            InformationComponent.Instance.SendMessage("You need a " + need.Name.ToString() + " to do this.", new Color(1f, 0, 0).ToUnsignedInteger(), peer);
                             userAgent.StopUsingGameObjectMT(false);
                             return;
                         }
@@ -216,17 +237,19 @@ namespace PersistentEmpiresLib.SceneScripts
                 }
                 if (this.IsDestroyed)
                 {
-                    InformationComponent.Instance.SendMessage("This object is disabled please try later.", new Color(1f, 0, 0).ToUnsignedInteger(), userAgent.MissionPeer.GetNetworkPeer());
+                    InformationComponent.Instance.SendMessage("This object is disabled please try later.", new Color(1f, 0, 0).ToUnsignedInteger(), peer);
                     userAgent.StopUsingGameObjectMT(false);
+                    GameNetwork.BeginBroadcastModuleEvent();
+                    GameNetwork.WriteMessage(new UpdateItemGatheringDestroyed(this, this.IsDestroyed));
+                    GameNetwork.EndBroadcastModuleEvent(GameNetwork.EventBroadcastFlags.None);
                     return;
                 }
 
-                NetworkCommunicator peer = userAgent.MissionPeer.GetNetworkPeer();
                 PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
                 Inventory playerInventory = persistentEmpireRepresentative.GetInventory();
                 if (!playerInventory.HasEnoughRoomFor(this.DropsItemObject, this.DropCount))
                 {
-                    InformationComponent.Instance.SendMessage("You don't have enough room in your inventory.", new Color(1f, 0, 0).ToUnsignedInteger(), userAgent.MissionPeer.GetNetworkPeer());
+                    InformationComponent.Instance.SendMessage("You don't have enough room in your inventory.", new Color(1f, 0, 0).ToUnsignedInteger(), peer);
                     userAgent.StopUsingGameObjectMT(false);
                     return;
                 }

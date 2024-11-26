@@ -110,8 +110,14 @@ namespace PersistentEmpiresLib.Helpers
                     }
                 }
             }
+            if (agent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return null;
+            }
             NetworkCommunicator player = agent.MissionPeer.GetNetworkPeer();
-            PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
+            
+                PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
             uint clothingColor1 = component.Culture.Color;
             uint clothingColor2 = component.Culture.Color2;
             if (f != null)
@@ -170,7 +176,17 @@ namespace PersistentEmpiresLib.Helpers
                     }
                 }
             }
+            if (agent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return null;
+            }
             NetworkCommunicator player = agent.MissionPeer.GetNetworkPeer();
+            if (player == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return null;
+            }
             PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
             uint clothingColor1 = component.Culture.Color;
             uint clothingColor2 = component.Culture.Color2;

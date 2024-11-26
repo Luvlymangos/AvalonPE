@@ -286,6 +286,8 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 craftable.CraftableItem.ItemType == ItemObject.ItemTypeEnum.Bow ||
                 craftable.CraftableItem.ItemType == ItemObject.ItemTypeEnum.Musket ||
                 craftable.CraftableItem.ItemType == ItemObject.ItemTypeEnum.Pistol ||
+                craftable.CraftableItem.ItemType == ItemObject.ItemTypeEnum.Arrows ||
+                craftable.CraftableItem.ItemType == ItemObject.ItemTypeEnum.Bolts ||
                 craftable.CraftableItem.ItemType == ItemObject.ItemTypeEnum.Crossbow ||
                 craftable.CraftableItem.ItemType == ItemObject.ItemTypeEnum.Shield) &&
                 craftable.CraftableItem.StringId != "AvalonHCRP_Grabber" &&
@@ -312,7 +314,12 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         public void AgentRequestCrafting(Agent agent, PE_CraftingStation craftingStation)
         {
             if (!agent.IsPlayerControlled) return;
-            NetworkCommunicator peer = agent.MissionPeer.GetNetworkPeer();
+            NetworkCommunicator peer = agent.MissionPeer?.GetNetworkPeer();
+            if (peer == null || !peer.IsConnectionActive)
+            {
+                Debug.Print("Agent's mission peer is null or disconnected");
+                return;
+            }
             if (GameNetwork.IsServer)
             {
                 PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();

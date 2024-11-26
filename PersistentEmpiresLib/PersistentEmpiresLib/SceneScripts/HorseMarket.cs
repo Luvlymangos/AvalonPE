@@ -113,10 +113,20 @@ namespace PersistentEmpiresLib.SceneScripts
             base.OnUse(userAgent);
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
                 Debug.Print("[USING LOG] AGENT USE " + this.GetType().Name);
                 userAgent.StopUsingGameObjectMT(false);
 
                 NetworkCommunicator player = userAgent.MissionPeer.GetNetworkPeer();
+                if (player == null || !player.IsConnectionActive)
+                {
+                    Debug.Print("Agent's mission peer is null or disconnected");
+                    return;
+                }
                 PersistentEmpireRepresentative persistentEmpireRepresentative = player.GetComponent<PersistentEmpireRepresentative>();
                 if (persistentEmpireRepresentative == null) return;
                 if(userAgent.MountAgent != null)
@@ -181,7 +191,17 @@ namespace PersistentEmpiresLib.SceneScripts
         {
             reportDamage = false;
             if (attackerAgent == null) return false;
+            if (attackerAgent.MissionPeer == null)
+            {
+                Debug.Print("Agent's mission peer is null");
+                return false;
+            }
             NetworkCommunicator player = attackerAgent.MissionPeer.GetNetworkPeer();
+            if (player == null || !player.IsConnectionActive)
+            {
+                Debug.Print("Agent's mission peer is null or disconnected");
+                return false;
+            }
             bool isAdmin = Main.IsPlayerAdmin(player);
             if (isAdmin && weapon.Item != null && weapon.Item.StringId == "pe_adminstockfiller")
             {

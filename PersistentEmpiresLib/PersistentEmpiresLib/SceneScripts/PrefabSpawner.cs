@@ -107,6 +107,12 @@ namespace PersistentEmpiresLib.SceneScripts
             userAgent.StopUsingGameObjectMT(true);
             if (GameNetwork.IsServer)
             {
+                if (userAgent.MissionPeer == null)
+                {
+                    Debug.Print("Agent's mission peer is null");
+                    return;
+                }
+
                 Debug.Print("[USING LOG] AGENT USE " + this.GetType().Name);
 
                 EquipmentIndex equipmentIndex = userAgent.GetWieldedItemIndex(Agent.HandIndex.MainHand);
