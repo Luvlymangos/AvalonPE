@@ -1,4 +1,5 @@
 ﻿using PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors;
+using PersistentEmpiresMission.HungerGames;
 using PersistentEmpiresMission.MissionBehaviors;
 using PersistentEmpiresServer.ServerMissions;
 using PersistentEmpiresServer.SpawnBehavior;
@@ -83,7 +84,10 @@ namespace PersistentEmpiresServer
                         // new WhitelistBehavior(),
                         new AgentCapture(),
                         new WeaponDamageOffset(),
-                        new GateGuardBehaviour()
+                        new GateGuardBehaviour(),
+                        new SpawnLoot(),
+                        new KillZone(),
+                        new GameController()
 						// new AgentHumanAILogic()
 						// new EquipmentControllerLeaveLogic(),
 						// new MultiplayerPreloadHelper()

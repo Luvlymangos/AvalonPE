@@ -1,27 +1,22 @@
-﻿using Newtonsoft.Json;
-using PersistentEmpiresLib.Database.DBEntities;
+﻿using PersistentEmpiresLib.Database.DBEntities;
 using PersistentEmpiresLib.Factions;
 using PersistentEmpiresLib.Helpers;
 using PersistentEmpiresLib.Data;
 using PersistentEmpiresLib.NetworkMessages.Server;
 using PersistentEmpiresLib.SceneScripts;
 using PersistentEmpiresLib.SceneScripts.Extensions;
-using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ObjectSystem;
-using Websocket.Client;
 using System.Text.RegularExpressions;
 using TaleWorlds.Engine;
-using Database.DBEntities;
-using TaleWorlds.PlayerServices;
-using Org.BouncyCastle.Bcpg;
+using PersistentEmpiresMission.MissionBehaviors;
+using TaleWorlds.MountAndBlade.DedicatedCustomServer;
+using System.Threading.Tasks;
 
 namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 {
@@ -40,7 +35,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             public string key { get; set; }
             public string error { get; set; }
         }
-
+        private GameController _gamecontroller;
         private FactionsBehavior _factionsBehavior;
         private CastlesBehavior _castlesBehavior;
         private HouseBehviour _houseBehavior;
@@ -185,7 +180,31 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         {
             base.OnPlayerDisconnectedFromServer(networkPeer);
             networkPeer.QuitFromMission = true;
+            this._gamecontroller = base.Mission.GetMissionBehavior<GameController>();
+            if (this._gamecontroller.PlayersAlive < 1)
+            {
+                InformationComponent.Instance.BroadcastAnnouncement($"The Game Is over!");
+                this._gamecontroller.GameStarted = false;
+                this._gamecontroller.PlayersAlive = 0;
+                this._gamecontroller.PlayersTotal = 0;
+                this._gamecontroller.PlayersDead = 0;
+                this._gamecontroller.PlayersToStart = 24;
+                this._gamecontroller.startrequested = 0;
+                this._gamecontroller.StartCompleted = false;
+                this._gamecontroller.votes.Clear();
+                this._gamecontroller.LastSpawned = 0;
+                this._gamecontroller.NewRound();
+                InformationComponent.Instance.BroadcastAnnouncement($"You Are the Winner!!");
+                foreach (NetworkCommunicator player in GameNetwork.NetworkPeers)
+                {
+                    //DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(player.VirtualPlayer.Id, false);
+                }
 
+            }
+            else
+            {
+                InformationComponent.Instance.BroadcastAnnouncement($"{this._gamecontroller.PlayersAlive} players remaining!");
+            }
             SaveSystemBehavior saveSystemBehavior = base.Mission.GetMissionBehavior<SaveSystemBehavior>();
 
             PersistentEmpireRepresentative persistentEmpireRepresentative = networkPeer.GetComponent<PersistentEmpireRepresentative>();
@@ -229,6 +248,41 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
         private void OnPlayerDies(NetworkCommunicator peer)
         {
             PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
+            this._gamecontroller = base.Mission.GetMissionBehavior<GameController>();
+            this._gamecontroller.PlayersAlive--;
+            if (this._gamecontroller.PlayersAlive == 1)
+            {
+                InformationComponent.Instance.BroadcastAnnouncement($"The Game Is over!");
+                this._gamecontroller.GameStarted = false;
+                this._gamecontroller.PlayersAlive = 0;
+                this._gamecontroller.PlayersTotal = 0;
+                this._gamecontroller.PlayersDead = 0;
+                this._gamecontroller.PlayersToStart = 24;
+                this._gamecontroller.startrequested = 0;
+                this._gamecontroller.StartCompleted = false;
+                this._gamecontroller.votes.Clear();
+                this._gamecontroller.LastSpawned = 0;
+                this._gamecontroller.NewRound();
+                InformationComponent.Instance.SendMessage("You are the winner!!", 0x0606c2d9, peer);
+                DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(peer.VirtualPlayer.Id, false);
+                foreach (NetworkCommunicator player in GameNetwork.NetworkPeers)
+                {
+                    //DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(player.VirtualPlayer.Id, false);
+                }
+                
+
+            }
+            else
+            {
+                InformationComponent.Instance.BroadcastAnnouncement($"{this._gamecontroller.PlayersAlive} players remaining!");
+            }
+            Task.Delay(3000).ContinueWith(_ =>
+            {
+                if (peer != null && peer.IsConnectionActive)
+                {
+                    DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(peer.VirtualPlayer.Id, false);
+                }
+            });
             LoggerHelper.LogAnAction(peer, LogAction.PlayerDied);
             persistentEmpireRepresentative.SpawnTimer.Reset(Mission.Current.CurrentTime, (float)MissionLobbyComponent.GetSpawnPeriodDurationForPeer(peer.GetComponent<MissionPeer>()));
             if (persistentEmpireRepresentative.KickedFromFaction)
@@ -251,10 +305,43 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             if (networkPeer.IsConnectionActive == false || networkPeer.IsNetworkActive == false) return;
             this._factionsBehavior = base.Mission.GetMissionBehavior<FactionsBehavior>();
             this._castlesBehavior = base.Mission.GetMissionBehavior<CastlesBehavior>();
+            this._gamecontroller = base.Mission.GetMissionBehavior<GameController>();
             this._houseBehavior = base.Mission.GetMissionBehavior<HouseBehviour>();
             this._plantingBehaviour = base.Mission.GetMissionBehavior<PlantingBehaviour>();
             this._protectionBehaviour = base.Mission.GetMissionBehavior<OfflineProtectionBehaviour>();
             PersistentEmpireRepresentative persistentEmpireRepresentative = networkPeer.GetComponent<PersistentEmpireRepresentative>();
+            if (_gamecontroller.PlayersTotal == _gamecontroller.PlayersToStart && _gamecontroller.GameStarted == false)
+            {
+                InformationComponent.Instance.SendAnnouncementToPlayer("Game Has Already Started! Please Wait for the next one", networkPeer);
+                InformationComponent.Instance.SendMessage("Game Has Already Started! Please Wait for the next one", Color.ConvertStringToColor("#d32f2fff").ToUnsignedInteger(), networkPeer);
+                Task.Delay(3000).ContinueWith(_ =>
+                {
+                    if (networkPeer != null && networkPeer.IsConnectionActive)
+                    {
+                        DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(networkPeer.VirtualPlayer.Id, false);
+                    }
+                });
+                return;
+            }
+            if (_gamecontroller.GameStarted == true)
+            {
+                InformationComponent.Instance.SendAnnouncementToPlayer("Game Has Already Started! Please Wait for the next one", networkPeer);
+                InformationComponent.Instance.SendMessage("Game Has Already Started! Please Wait for the next one", Color.ConvertStringToColor("#d32f2fff").ToUnsignedInteger(), networkPeer);
+                Task.Delay(3000).ContinueWith(_ =>
+                {
+                    if (networkPeer != null && networkPeer.IsConnectionActive)
+                    {
+                        DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(networkPeer.VirtualPlayer.Id, false);
+                    }
+                });
+                return;
+            }
+            _gamecontroller.PlayersTotal++;
+            _gamecontroller.PlayersAlive++;
+            if (_gamecontroller.PlayersTotal == _gamecontroller.PlayersToStart)
+            {
+                _gamecontroller.BeginMatch();
+            }
             if (persistentEmpireRepresentative != null)
             {
                 if (persistentEmpireRepresentative.Gold <= 0)
@@ -271,15 +358,15 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             if (GameNetwork.IsServer)
             {
 #if SERVER
-                InformationComponent.Instance.SendMessage("Your player id is " + networkPeer.VirtualPlayer.Id.ToString(), Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
-                if (_protectionBehaviour.IsOfflineProtectionActive)
-                {
-                    InformationComponent.Instance.SendMessage("Offline protection is active", Color.ConvertStringToColor("#FF0000FF").ToUnsignedInteger(), networkPeer);
-                }
-                else
-                {
-                    InformationComponent.Instance.SendMessage("Offline protection is not active", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
-                }
+                //InformationComponent.Instance.SendMessage("Your player id is " + networkPeer.VirtualPlayer.Id.ToString(), Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
+                //if (_protectionBehaviour.IsOfflineProtectionActive)
+                //{
+                //    InformationComponent.Instance.SendMessage("Offline protection is active", Color.ConvertStringToColor("#FF0000FF").ToUnsignedInteger(), networkPeer);
+                //}
+                //else
+                //{
+                //    InformationComponent.Instance.SendMessage("Offline protection is not active", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
+                //}
 #endif
                 //SYNC FACTIONS
                 List<PE_CastleBanner> castleBanners = this._castlesBehavior.castles.Values.ToList();
@@ -405,63 +492,64 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                     //SYNC PLAYER CLASS,GOLD,HUNGER,FACTION
                     persistentEmpireRepresentative.SetClass(dbPlayer.Class);
                     persistentEmpireRepresentative.SetGold(dbPlayer.Money);
-                    persistentEmpireRepresentative.SetHunger(dbPlayer.Hunger);
+                    persistentEmpireRepresentative.SetHunger(100);
                     this._factionsBehavior.SetPlayerFaction(networkPeer, dbPlayer.FactionIndex, -1);
 
                     persistentEmpireRepresentative.LoadedDbPosition = new Vec3(dbPlayer.PosX, dbPlayer.PosY, dbPlayer.PosZ);
                     Equipment loadedEquipment = new Equipment();
                     int[] loadedAmmo = new int[4];
                     //SYNC PLAYER EQUIPMENT
-                    if (dbPlayer.Equipment_0 != null)
-                    {
-                        loadedEquipment[EquipmentIndex.Weapon0] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Equipment_0));
-                        loadedAmmo[0] = dbPlayer.Ammo_0;
-                    }
-                    if (dbPlayer.Equipment_1 != null)
-                    {
-                        loadedEquipment[EquipmentIndex.Weapon1] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Equipment_1));
-                        loadedAmmo[1] = dbPlayer.Ammo_1;
-                    }
-                    if (dbPlayer.Equipment_2 != null)
-                    {
-                        loadedEquipment[EquipmentIndex.Weapon2] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Equipment_2));
-                        loadedAmmo[2] = dbPlayer.Ammo_2;
-                    }
-                    if (dbPlayer.Equipment_3 != null)
-                    {
-                        loadedEquipment[EquipmentIndex.Weapon3] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Equipment_3));
-                        loadedAmmo[3] = dbPlayer.Ammo_3;
-                    }
-                    if (dbPlayer.Armor_Head != null)
-                    {
-                        loadedEquipment[EquipmentIndex.Head] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Armor_Head));
-                    }
-                    if (dbPlayer.Armor_Cape != null)
-                    {
-                        loadedEquipment[EquipmentIndex.Cape] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Armor_Cape));
-                    }
-                    if (dbPlayer.Armor_Gloves != null)
-                    {
-                        loadedEquipment[EquipmentIndex.Gloves] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Armor_Gloves));
-                    }
-                    if (dbPlayer.Armor_Body != null)
-                    {
-                        loadedEquipment[EquipmentIndex.Body] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Armor_Body));
-                    }
-                    if (dbPlayer.Armor_Leg != null)
-                    {
-                        loadedEquipment[EquipmentIndex.Leg] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Armor_Leg));
-                    }
-                    if (dbPlayer.Horse != null)
-                    {
-                        loadedEquipment[EquipmentIndex.Horse] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Horse));
-                    }
-                    if (dbPlayer.HorseHarness != null)
-                    {
-                        loadedEquipment[EquipmentIndex.HorseHarness] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.HorseHarness));
-                    }
+                    //if (dbPlayer.Equipment_0 != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.Weapon0] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Equipment_0));
+                    //    loadedAmmo[0] = dbPlayer.Ammo_0;
+                    //}
+                    //if (dbPlayer.Equipment_1 != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.Weapon1] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Equipment_1));
+                    //    loadedAmmo[1] = dbPlayer.Ammo_1;
+                    //}
+                    //if (dbPlayer.Equipment_2 != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.Weapon2] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Equipment_2));
+                    //    loadedAmmo[2] = dbPlayer.Ammo_2;
+                    //}
+                    //if (dbPlayer.Equipment_3 != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.Weapon3] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Equipment_3));
+                    //    loadedAmmo[3] = dbPlayer.Ammo_3;
+                    //}
+                    //if (dbPlayer.Armor_Head != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.Head] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Armor_Head));
+                    //}
+                    //if (dbPlayer.Armor_Cape != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.Cape] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Armor_Cape));
+                    //}
+                    //if (dbPlayer.Armor_Gloves != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.Gloves] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Armor_Gloves));
+                    //}
+                    //if (dbPlayer.Armor_Body != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.Body] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Armor_Body));
+                    //}
+                    //if (dbPlayer.Armor_Leg != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.Leg] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Armor_Leg));
+                    //}
+                    //if (dbPlayer.Horse != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.Horse] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.Horse));
+                    //}
+                    //if (dbPlayer.HorseHarness != null)
+                    //{
+                    //    loadedEquipment[EquipmentIndex.HorseHarness] = new EquipmentElement(MBObjectManager.Instance.GetObject<ItemObject>(dbPlayer.HorseHarness));
+                    //}
                     persistentEmpireRepresentative.LoadedSpawnEquipment = loadedEquipment;
-                    persistentEmpireRepresentative.LoadedHealth = dbPlayer.Health <= 0 ? 10 : dbPlayer.Health;
+                    //persistentEmpireRepresentative.LoadedHealth = dbPlayer.Health <= 0 ? 10 : dbPlayer.Health;
+                    persistentEmpireRepresentative.LoadedHealth = 150;
                     persistentEmpireRepresentative.LoadFromDb = true;
                     persistentEmpireRepresentative.LoadedAmmo = loadedAmmo;
                     //SYNC SKILLS
@@ -560,18 +648,18 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                             }
                         }
                     }
-                    if (this.AdminOn == 1)
-                    {
-                        InformationComponent.Instance.SendMessage("1 Admin is online", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
-                    }
-                    else if (this.AdminOn > 1)
-                    {
-                        InformationComponent.Instance.SendMessage($"{this.AdminOn} Admin's are online", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
-                    }
-                    else
-                    {
-                        InformationComponent.Instance.SendMessage("No Admin is online", Color.ConvertStringToColor("#FF0000FF").ToUnsignedInteger(), networkPeer);
-                    }
+                    //if (this.AdminOn == 1)
+                    //{
+                    //    InformationComponent.Instance.SendMessage("1 Admin is online", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
+                    //}
+                    //else if (this.AdminOn > 1)
+                    //{
+                    //    InformationComponent.Instance.SendMessage($"{this.AdminOn} Admin's are online", Color.ConvertStringToColor("#4CAF50FF").ToUnsignedInteger(), networkPeer);
+                    //}
+                    //else
+                    //{
+                    //    InformationComponent.Instance.SendMessage("No Admin is online", Color.ConvertStringToColor("#FF0000FF").ToUnsignedInteger(), networkPeer);
+                    //}
 #endif
                 }
                 else
@@ -597,6 +685,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 if (!created)
                 {
                     persistentEmpireRepresentative.SetInventory(Inventory.Deserialize(dbInventory.InventorySerialized, "PlayerInventory", null));
+                    persistentEmpireRepresentative.GetInventory().EmptyInventory();
                 }
                 
             }
@@ -617,7 +706,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                     }
                 }
             }
-            Mission.Current.SetMissionCorpseFadeOutTimeInSeconds(60);
+            Mission.Current.SetMissionCorpseFadeOutTimeInSeconds(6000);
             if(GameNetwork.IsServer)
             {
                 ConfigManager.Initialize();

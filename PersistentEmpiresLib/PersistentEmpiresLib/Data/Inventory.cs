@@ -228,6 +228,18 @@ namespace PersistentEmpiresLib.Data
             }
         }
 
+        public List<int> EmptyInventorySynced()
+        {
+            List<int> slots = new List<int>();
+            foreach (InventorySlot slot in this.Slots)
+            {
+                slot.Count = 0;
+                slot.Item = null;
+                slots.Add(this.Slots.IndexOf(slot));
+            }
+            return slots;
+        }
+
         public string Serialize()
         {
             string[] slots = new string[this.Slots.Count];

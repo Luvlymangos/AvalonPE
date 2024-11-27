@@ -87,6 +87,7 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 registerer.Register<ExistingObjectsEnd>(this.HandleFromServerExistingObjectsEnd);
                 registerer.Register<SyncCraftingStats>(this.HandleServerCraftingStats);
                 registerer.Register<SyncSkillLocks>(this.HandleSkillLocks);
+                registerer.Register<UpdateKillzone>(this.HandleKillzone);
             }
             else
             {
@@ -96,6 +97,35 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             }
         }
 
+
+        private void HandleKillzone(UpdateKillzone message)
+        {
+            // Find the KillZone entity
+            GameEntity KillZoneEntity = Mission.Scene.FindEntityWithTag("KillZone");
+            if (KillZoneEntity != null)
+            {
+                // Get the current global frame
+                MatrixFrame KZEMF = KillZoneEntity.GetGlobalFrame();
+
+                // Calculate the scaling factors for X, Y, and Z
+                Vec3 currentScale = KZEMF.GetScale();
+                float scaleXFactor = message.Size / currentScale.X;
+                float scaleYFactor = message.Size / currentScale.Y;
+
+                // Apply scaling only to X and Y, keeping Z unchanged
+                KZEMF.Scale(new Vec3(scaleXFactor, scaleYFactor, 1.0f));
+
+                // Update the global frame of the entity
+                KillZoneEntity.SetGlobalFrame(KZEMF);
+
+                // Debug log for verification
+                Debug.Print($"KillZone scaled to: X={message.Size}, Y={message.Size}, Z={currentScale.Z}");
+            }
+            else
+            {
+                Debug.Print("KillZone entity not found!");
+            }
+        }
 
         private void HandleSkillLocks(SyncSkillLocks message)
         {

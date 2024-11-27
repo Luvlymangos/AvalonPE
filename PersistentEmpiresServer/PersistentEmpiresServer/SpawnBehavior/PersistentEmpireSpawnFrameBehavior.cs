@@ -13,6 +13,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ObjectSystem;
+using PersistentEmpiresMission.MissionBehaviors;
 
 namespace PersistentEmpiresServer.SpawnBehavior
 {
@@ -53,27 +54,31 @@ namespace PersistentEmpiresServer.SpawnBehavior
 
             PersistentEmpireRepresentative persistentEmpireRepresentative = peer.GetComponent<PersistentEmpireRepresentative>();
             PE_SpawnFrame frame;
-            if (persistentEmpireRepresentative == null)
-            {
-                frame = base.Mission.GetMissionBehavior<SpawnFrameSelectionBehavior>().DefaultSpawnFrames[0];
-            }
-            else if (persistentEmpireRepresentative.GetNextSpawnFrame() == null)
-            {
-                List<PE_SpawnFrame> spawnable = persistentEmpireRepresentative.GetSpawnableCastleFrames();
-                if (spawnable.Count > 0)
-                {
-                    frame = spawnable[0];
-                }
-                else
-                {
-                    frame = base.Mission.GetMissionBehavior<SpawnFrameSelectionBehavior>().DefaultSpawnFrames[0];
-                }
-            }
-            else
-            {
-                frame = persistentEmpireRepresentative.GetNextSpawnFrame();
-                if (frame.GetCastleBanner() != null && frame.GetCastleBanner().FactionIndex != persistentEmpireRepresentative.GetFactionIndex()) frame = base.Mission.GetMissionBehavior<SpawnFrameSelectionBehavior>().DefaultSpawnFrames[0];
-            }
+            GameController gc = Mission.Current.GetMissionBehavior<GameController>();
+            frame = base.Mission.GetMissionBehavior<SpawnFrameSelectionBehavior>().DefaultSpawnFrames[gc.LastSpawned];
+            persistentEmpireRepresentative.BRSpawnFrame = frame;
+            gc.LastSpawned++;
+            //if (persistentEmpireRepresentative == null)
+            //{
+            //    frame = base.Mission.GetMissionBehavior<SpawnFrameSelectionBehavior>().DefaultSpawnFrames[MBRandom.RandomInt(0,24)];
+            //}
+            //else if (persistentEmpireRepresentative.GetNextSpawnFrame() == null)
+            //{
+            //    List<PE_SpawnFrame> spawnable = persistentEmpireRepresentative.GetSpawnableCastleFrames();
+            //    if (spawnable.Count > 0)
+            //    {
+            //        frame = spawnable[0];
+            //    }
+            //    else
+            //    {
+            //        frame = base.Mission.GetMissionBehavior<SpawnFrameSelectionBehavior>().DefaultSpawnFrames[MBRandom.RandomInt(0, 24)];
+            //    }
+            //}
+            //else
+            //{
+            //    frame = persistentEmpireRepresentative.GetNextSpawnFrame();
+            //    if (frame.GetCastleBanner() != null && frame.GetCastleBanner().FactionIndex != persistentEmpireRepresentative.GetFactionIndex()) frame = base.Mission.GetMissionBehavior<SpawnFrameSelectionBehavior>().DefaultSpawnFrames[0];
+            //}
             return frame.GameEntity.GetGlobalFrame();
         }
 

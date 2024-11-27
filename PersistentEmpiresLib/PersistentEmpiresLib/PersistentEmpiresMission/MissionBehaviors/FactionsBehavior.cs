@@ -117,18 +117,18 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 Banner banner2 = new Banner("24.193.116.1536.1536.768.768.1.0.0");
 
                 Faction commoners = new Faction(commonerCulture, banner, "Commoners");
-                Faction outlaws = new Faction(outlawCulture, banner2, "Outlaws");
+                //Faction outlaws = new Faction(outlawCulture, banner2, "Outlaws");
 
                 //Factions Setup
 
                 commoners.team = Mission.Current.Teams.Add(BattleSideEnum.Attacker, commonerCulture.BackgroundColor1, commonerCulture.ForegroundColor1, banner);
-                outlaws.team = Mission.Current.Teams.Add(BattleSideEnum.Attacker, outlawCulture.BackgroundColor1, outlawCulture.ForegroundColor1, banner);
-                outlaws.team.SetIsEnemyOf(outlaws.team, true);
-                outlaws.team.SetIsEnemyOf(commoners.team, true);
+                //outlaws.team = Mission.Current.Teams.Add(BattleSideEnum.Attacker, outlawCulture.BackgroundColor1, outlawCulture.ForegroundColor1, banner);
+                //outlaws.team.SetIsEnemyOf(outlaws.team, true);
+                //outlaws.team.SetIsEnemyOf(commoners.team, true);
                 commoners.team.SetIsEnemyOf(commoners.team, true);
 
                 this.AddFaction(0, commoners);
-                this.AddFaction(1, outlaws);
+                //this.AddFaction(1, outlaws);
 
                 List<GameEntity> _gameEntites = new List<GameEntity>();
                 base.Mission.Scene.GetAllEntitiesWithScriptComponent<PEFactionBanner>(ref _gameEntites);

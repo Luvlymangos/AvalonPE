@@ -40,6 +40,7 @@ namespace PersistentEmpiresLib
         public Equipment LoadedSpawnEquipment;
         public bool IsLordClass = false;
         public int SkillCap = 1200;
+        public PE_SpawnFrame BRSpawnFrame;
         public Dictionary<string, int> LoadedSkills = new Dictionary<string, int>();
         public Dictionary<string,bool> LockedSkills = new Dictionary<string, bool>();
 

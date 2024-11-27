@@ -157,6 +157,7 @@
     <Compile Include="Database\DBEntities\DBMoneyChest.cs" />
     <Compile Include="Database\DBEntities\DBSkillLocks.cs" />
     <Compile Include="Database\DBEntities\DBWorkshops.cs" />
+    <Compile Include="NetworkMessages\Server\UpdateKillzone.cs" />
     <Compile Include="PersistentEmpiresMission\AIBehaviours\AgentComponents\BanditAgentComponent.cs" />
     <Compile Include="PersistentEmpiresMission\AIBehaviours\Data\BanditAgentType.cs" />
     <Compile Include="PersistentEmpiresMission\AIBehaviours\Data\GuardType.cs" />
@@ -348,6 +349,9 @@
     <Compile Include="PersistentEmpiresMission\AIBehaviours\BanditBehaviour.cs" />
     <Compile Include="PersistentEmpiresMission\AIBehaviours\SceneScripts\PE_BanditSpawnZone.cs" />
     <Compile Include="PersistentEmpiresMission\AIBehaviours\SceneScripts\PE_GuardPost.cs" />
+    <Compile Include="PersistentEmpiresMission\HungerGames\GameController.cs" />
+    <Compile Include="PersistentEmpiresMission\HungerGames\KillZone.cs" />
+    <Compile Include="PersistentEmpiresMission\HungerGames\SpawnLoot.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\AdminClientBehavior.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\AgentCapturing.cs" />
     <Compile Include="PersistentEmpiresMission\MissionBehaviors\AgentHungerBehavior.cs" />
@@ -410,6 +414,7 @@
     <Compile Include="SceneScripts\GrowingPlant.cs" />
     <Compile Include="SceneScripts\GrowingPoint.cs" />
     <Compile Include="SceneScripts\HorseMarket.cs" />
+    <Compile Include="SceneScripts\HungerGames\LootBox.cs" />
     <Compile Include="SceneScripts\ImportExport.cs" />
     <Compile Include="SceneScripts\Interfaces\IMissionObjectHash.cs" />
     <Compile Include="SceneScripts\Interfaces\IMoveable.cs" />
