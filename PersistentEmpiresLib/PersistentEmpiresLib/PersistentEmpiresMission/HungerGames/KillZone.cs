@@ -84,7 +84,7 @@ namespace PersistentEmpiresMission.HungerGames
 
                     foreach (Agent agent in Mission.Agents)
                     {
-                        if (agent.Position.Distance(KillZoneEntity.GetGlobalFrame().origin) > KillZoneEntity.GetGlobalFrame().GetScale().X / 2)
+                        if (new Vec3(agent.Position.X,agent.Position.Y, 0).Distance(new Vec3(KillZoneEntity.GlobalPosition.X,KillZoneEntity.GlobalPosition.Y,0)) > KillZoneEntity.GetGlobalFrame().GetScale().X / 2)
                         {
                             Blow blow = new Blow(agent.Index);
                             blow.DamageType = TaleWorlds.Core.DamageTypes.Pierce;

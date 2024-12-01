@@ -17,6 +17,7 @@ using TaleWorlds.Engine;
 using PersistentEmpiresMission.MissionBehaviors;
 using TaleWorlds.MountAndBlade.DedicatedCustomServer;
 using System.Threading.Tasks;
+using TaleWorlds.PlayerServices;
 
 namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
 {
@@ -166,6 +167,9 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 }
             }
         }
+
+
+
         public override void OnPlayerConnectedToServer(NetworkCommunicator networkPeer)
         {
             base.OnPlayerConnectedToServer(networkPeer);
@@ -183,7 +187,6 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             this._gamecontroller = base.Mission.GetMissionBehavior<GameController>();
             if (this._gamecontroller.PlayersAlive < 1)
             {
-                InformationComponent.Instance.BroadcastAnnouncement($"The Game Is over!");
                 this._gamecontroller.GameStarted = false;
                 this._gamecontroller.PlayersAlive = 0;
                 this._gamecontroller.PlayersTotal = 0;
@@ -195,10 +198,11 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 this._gamecontroller.LastSpawned = 0;
                 this._gamecontroller.NewRound();
                 InformationComponent.Instance.BroadcastAnnouncement($"You Are the Winner!!");
-                foreach (NetworkCommunicator player in GameNetwork.NetworkPeers)
+                Task.Delay(5000).ContinueWith(_ =>
                 {
-                    //DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(player.VirtualPlayer.Id, false);
-                }
+                    Mission.Current.ResetMission();
+                });
+                
 
             }
             else
@@ -252,7 +256,6 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             this._gamecontroller.PlayersAlive--;
             if (this._gamecontroller.PlayersAlive == 1)
             {
-                InformationComponent.Instance.BroadcastAnnouncement($"The Game Is over!");
                 this._gamecontroller.GameStarted = false;
                 this._gamecontroller.PlayersAlive = 0;
                 this._gamecontroller.PlayersTotal = 0;
@@ -263,26 +266,18 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
                 this._gamecontroller.votes.Clear();
                 this._gamecontroller.LastSpawned = 0;
                 this._gamecontroller.NewRound();
-                InformationComponent.Instance.SendMessage("You are the winner!!", 0x0606c2d9, peer);
-                DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(peer.VirtualPlayer.Id, false);
-                foreach (NetworkCommunicator player in GameNetwork.NetworkPeers)
+                InformationComponent.Instance.BroadcastAnnouncement($"You Are the Winner!!");
+                Task.Delay(5000).ContinueWith(_ =>
                 {
-                    //DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(player.VirtualPlayer.Id, false);
-                }
-                
+                    Mission.Current.ResetMission();
+                });
+
 
             }
             else
             {
                 InformationComponent.Instance.BroadcastAnnouncement($"{this._gamecontroller.PlayersAlive} players remaining!");
             }
-            Task.Delay(3000).ContinueWith(_ =>
-            {
-                if (peer != null && peer.IsConnectionActive)
-                {
-                    DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(peer.VirtualPlayer.Id, false);
-                }
-            });
             LoggerHelper.LogAnAction(peer, LogAction.PlayerDied);
             persistentEmpireRepresentative.SpawnTimer.Reset(Mission.Current.CurrentTime, (float)MissionLobbyComponent.GetSpawnPeriodDurationForPeer(peer.GetComponent<MissionPeer>()));
             if (persistentEmpireRepresentative.KickedFromFaction)
@@ -314,26 +309,12 @@ namespace PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors
             {
                 InformationComponent.Instance.SendAnnouncementToPlayer("Game Has Already Started! Please Wait for the next one", networkPeer);
                 InformationComponent.Instance.SendMessage("Game Has Already Started! Please Wait for the next one", Color.ConvertStringToColor("#d32f2fff").ToUnsignedInteger(), networkPeer);
-                Task.Delay(3000).ContinueWith(_ =>
-                {
-                    if (networkPeer != null && networkPeer.IsConnectionActive)
-                    {
-                        DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(networkPeer.VirtualPlayer.Id, false);
-                    }
-                });
                 return;
             }
             if (_gamecontroller.GameStarted == true)
             {
                 InformationComponent.Instance.SendAnnouncementToPlayer("Game Has Already Started! Please Wait for the next one", networkPeer);
                 InformationComponent.Instance.SendMessage("Game Has Already Started! Please Wait for the next one", Color.ConvertStringToColor("#d32f2fff").ToUnsignedInteger(), networkPeer);
-                Task.Delay(3000).ContinueWith(_ =>
-                {
-                    if (networkPeer != null && networkPeer.IsConnectionActive)
-                    {
-                        DedicatedCustomServerSubModule.Instance.DedicatedCustomGameServer.KickPlayer(networkPeer.VirtualPlayer.Id, false);
-                    }
-                });
                 return;
             }
             _gamecontroller.PlayersTotal++;

@@ -34,6 +34,10 @@ namespace PersistentEmpiresServer.ChatCommands.Commands
             GameController gameController = Mission.Current.GetMissionBehavior<GameController>();
             if (gameController != null)
             {
+                if (gameController.votes.Count() == 0)
+                {
+                    InformationComponent.Instance.BroadcastAnnouncement($"{networkPeer.UserName} Has started a vote to start the match! use !Start to start it");
+                }
                 gameController.votes.Add(networkPeer);
                 if (GameNetwork.NetworkPeerCount < 4)
                 {

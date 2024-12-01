@@ -23,6 +23,7 @@ namespace PersistentEmpiresServer.SpawnBehavior
         protected event Action<MissionPeer> OnPeerSpawnedFromVisuals;
         protected event Action<MissionPeer> OnAllAgentsFromPeerSpawnedFromVisuals;
         protected bool PersistPosition = false;
+        GameController gc;
         public override bool AllowEarlyAgentVisualsDespawning(MissionPeer missionPeer)
         {
             return true;
@@ -33,6 +34,7 @@ namespace PersistentEmpiresServer.SpawnBehavior
 
             base.Initialize(spawnComponent);
             this.PersistPosition = ConfigManager.GetBoolConfig("PersistDisconnectPosition", true);
+            gc = Mission.Current.GetMissionBehavior<GameController>();
         }
 
         public override int GetMaximumReSpawnPeriodForPeer(MissionPeer peer)
@@ -210,8 +212,11 @@ namespace PersistentEmpiresServer.SpawnBehavior
 
         public override void OnTick(float dt)
         {
-            this.SpawnAgents();
-            this.OverridenOnTick(dt);
+            if (gc != null && !gc.GameStarted && gc.startrequested == 0)
+            {
+                this.SpawnAgents();
+                this.OverridenOnTick(dt);
+            }
         }
         protected override void SpawnAgents()
         {

@@ -1,11 +1,14 @@
 ﻿using PersistentEmpiresLib;
 using PersistentEmpiresLib.PersistentEmpiresMission.MissionBehaviors;
+using PersistentEmpiresLib.SceneScripts;
 using PersistentEmpiresMission.HungerGames;
+using SceneScripts.HungerGames;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 
@@ -40,11 +43,19 @@ namespace PersistentEmpiresMission.MissionBehaviors
             {
                 kz.NewRound();
             }
+            startrequested = 0;
         }
 
         public void BeginMatch()
         {
-            startrequested = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            foreach (GameEntity ge in Mission.Current.GetActiveEntitiesWithScriptComponentOfType<PE_InventoryEntity>())
+            {
+                if (ge.GetPrefabName() == "pe_loot")
+                {
+                    ge.Remove(0);
+                }
+            }
+                startrequested = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             InformationComponent.Instance.BroadcastAnnouncement("Game Starting in 10 seconds");
         }
 
