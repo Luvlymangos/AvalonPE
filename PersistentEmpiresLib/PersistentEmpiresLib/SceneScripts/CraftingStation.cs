@@ -252,12 +252,8 @@ namespace PersistentEmpiresLib.SceneScripts
                 //Load Craftables
                 string xmlPath = ModuleHelper.GetXmlPath(this.ModuleFolder, "CraftingRecipies/" + this.CraftingRecieptTag);
                 XmlDocument xmlDocument = new XmlDocument();
-                try
-                { xmlDocument.Load(xmlPath); }
-                catch (Exception e)
-                {
-                    Debug.Print("[Avalon HCRP] Error Loading Crafting Recipies For " + this.StationName + " " + this.GameEntity.GetGlobalFrame() + " Looking For: " + this.CraftingRecieptTag, 0, Debug.DebugColor.Red);
-                }
+                xmlDocument.Load(xmlPath);
+                Debug.Print("Loading Crafting Recipies For " + this.CraftingRecieptTag, 0, Debug.DebugColor.DarkCyan);
                 foreach (XmlNode node in xmlDocument.DocumentElement.ChildNodes)
                 {
                     if (node.Name == "Craftings") this.Craftings = node.InnerText.Trim();

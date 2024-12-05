@@ -39,7 +39,6 @@ namespace PersistentEmpires.Views.ViewsVM
         private int _mininglevel;
         private int _fletchinglevel;
         private int _animallevel;
-        private int _totallevel;
         private string _weavinglock;
         private string _weaponlock;
         private string _armourlock;
@@ -334,19 +333,6 @@ namespace PersistentEmpires.Views.ViewsVM
             }
         }
 
-        [DataSourceProperty]
-        public int TotalLevel
-        {
-            get => this._totallevel;
-            set
-            {
-                if (value != this._totallevel)
-                {
-                    this._totallevel = value;
-                    base.OnPropertyChangedWithValue(value, "TotalLevel");
-                }
-            }
-        }
         
 
         [DataSourceProperty]

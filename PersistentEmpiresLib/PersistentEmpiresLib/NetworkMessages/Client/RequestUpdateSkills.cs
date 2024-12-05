@@ -37,7 +37,7 @@ namespace PersistentEmpiresLib.NetworkMessages.Client
             bool result = true;
             Id = GameNetworkMessage.ReadNetworkPeerReferenceFromPacket(ref result);
             Skill = GameNetworkMessage.ReadStringFromPacket(ref result);
-            Value = GameNetworkMessage.ReadIntFromPacket(new CompressionInfo.Integer(0, 1000, true), ref result);
+            Value = GameNetworkMessage.ReadIntFromPacket(new CompressionInfo.Integer(int.MinValue, int.MaxValue, true), ref result);
             return result;
         }
 
@@ -45,7 +45,7 @@ namespace PersistentEmpiresLib.NetworkMessages.Client
         {
             GameNetworkMessage.WriteNetworkPeerReferenceToPacket(Id);
             GameNetworkMessage.WriteStringToPacket(Skill);
-            GameNetworkMessage.WriteIntToPacket(Value, new CompressionInfo.Integer(0, 1000, true));
+            GameNetworkMessage.WriteIntToPacket(Value, new CompressionInfo.Integer(int.MinValue, int.MaxValue, true));
         }
     }
 }

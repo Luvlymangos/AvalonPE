@@ -39,8 +39,9 @@ namespace PersistentEmpiresLib
         public Vec3 LoadedDbPosition;
         public Equipment LoadedSpawnEquipment;
         public bool IsLordClass = false;
-        public int SkillCap = 1200;
         public PE_SpawnFrame BRSpawnFrame;
+        public int SkillCap = 50000;
+        public int IndiviualSkillCap = 5000;
         public Dictionary<string, int> LoadedSkills = new Dictionary<string, int>();
         public Dictionary<string,bool> LockedSkills = new Dictionary<string, bool>();
 
@@ -68,15 +69,16 @@ namespace PersistentEmpiresLib
 
         float GetDiminishingFactor(int skillLevel)
         {
-            float maxSkill = (float)SkillCap; // Maximum skill level
-            float minFactor = 0.20f;  // Minimum factor (1% of skill gained)
+            float maxSkill = (float)IndiviualSkillCap; // Maximum skill level
+            float minFactor = 0.01f;  // Minimum factor (1% of skill gained)
 
-            // Calculate the diminishing factor with a minimum threshold
-            float diminishingFactor2 = 1.0f - (float)Math.Pow(skillLevel / maxSkill, 0.5f);
+            // Apply a stronger diminishing factor by increasing the exponent
+            float diminishingFactor = 1.0f - (float)Math.Pow(skillLevel / maxSkill, 1.5f);
 
             // Ensure it does not drop below the minimum factor
-            return Math.Max(diminishingFactor2, minFactor);
+            return Math.Max(diminishingFactor, minFactor);
         }
+
 
         public KeyValuePair<string, int> GetRandomSkillExcluding(string excludeSkillName)
         {
@@ -129,9 +131,9 @@ namespace PersistentEmpiresLib
                 totalSkills += skillValue;
             }
 
-            if (LoadedSkills[skillName] >= 1000)
+            if (LoadedSkills[skillName] >= IndiviualSkillCap)
             {
-                LoadedSkills[skillName] = 1000;
+                LoadedSkills[skillName] = IndiviualSkillCap;
                 this.SyncCraftingStats(skillName);
             }
 
@@ -173,7 +175,7 @@ namespace PersistentEmpiresLib
 
             //Increase Skill Level
             if (LockedSkills.ContainsKey(skillName) && LockedSkills[skillName]) return false;
-            if (LoadedSkills[skillName] == 1000) return false;
+            if (LoadedSkills[skillName] == IndiviualSkillCap) return false;
             totalSkills = 0;
             foreach (int skillValue in LoadedSkills.Values)
             {
